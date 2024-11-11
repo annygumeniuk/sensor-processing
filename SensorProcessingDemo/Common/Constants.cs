@@ -5,7 +5,7 @@
         // LET`S IMAGINE ALL THIS CONSTS ARE FOR OPERATION ROOM
 
         public const string TEMPERATURE = "Temperature";
-        public const string HUMIDINY    = "Humidity";
+        public const string HUMIDITY    = "Humidity";
         public const string LIGHTING    = "Lighting";
 
         // In °C 

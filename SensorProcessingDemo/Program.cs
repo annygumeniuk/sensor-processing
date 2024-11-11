@@ -1,7 +1,12 @@
+using SensorProcessingDemo.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Register a Data Service
+builder.Services.AddSingleton<Data>();
 
 var app = builder.Build();
 

@@ -1,0 +1,57 @@
+﻿@model SensorProcessingDemo.Models.SensorViewModel
+
+@{
+    ViewData["Title"] = "Sensor Data Chart";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<canvas id="sensorChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Get the sensor data from the model (passed from the controller)
+    var sensorData = @Html.Raw(Json.Serialize(Model.Sensors));
+
+    // Prepare the data for the chart (x-axis: dateTime, y-axis: value)
+    var labels = sensorData.map(function(sensor) {
+        return sensor.dateTime; // Using dateTime for x-axis
+    });
+
+    var values = sensorData.map(function(sensor) {
+        return sensor.Value; // Using sensor values for y-axis
+    });
+
+    // Create the chart
+    var ctx = document.getElementById('sensorChart').getContext('2d');
+    var sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels, // X-axis labels (dates)
+            datasets: [{
+                label: 'Sensor Values',
+                data: values, // Y-axis data (sensor values)
+                borderColor: 'rgb(75, 192, 192)', // Line color
+                fill: false // Do not fill under the line
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'category',
+                    title: {
+                        display: true,
+                        text: 'Date and Time'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Sensor Value'
+                    }
+                }
+            }
+        }
+    });
+</script>

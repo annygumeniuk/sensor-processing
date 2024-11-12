@@ -1,57 +1,56 @@
-﻿@model SensorProcessingDemo.Models.SensorViewModel
+﻿@model SensorProcessingDemo.Models.Sensor
 
-@{
-    ViewData["Title"] = "Sensor Data Chart";
-}
+<head>    
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <script>
+        window.onload = function () {
+            // Parse the JSON data from the ViewBag
+            var groupedData = JSON.parse('@Html.Raw(ViewBag.GroupedDataPoints)');
 
-<h1>@ViewData["Title"]</h1>
+            // Loop through each sensor type and create a separate chart
+            for (var sensorType in groupedData) {
+                var dataPoints = groupedData[sensorType].map(function (point) {
+                    return {
+                        x: new Date(point.dateTime),
+                        y: point.Value
+                    };
+                });
 
-<canvas id="sensorChart" width="400" height="200"></canvas>
+                // Create a new chart container for each sensor
+                var chartContainer = document.createElement("div");
+                chartContainer.id = sensorType + "ChartContainer";
+                chartContainer.style.height = "300px"; // 370 works good
+                chartContainer.style.width = "98%";
+                document.body.appendChild(chartContainer); // Append to body or any other section
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Get the sensor data from the model (passed from the controller)
-    var sensorData = @Html.Raw(Json.Serialize(Model.Sensors));
-
-    // Prepare the data for the chart (x-axis: dateTime, y-axis: value)
-    var labels = sensorData.map(function(sensor) {
-        return sensor.dateTime; // Using dateTime for x-axis
-    });
-
-    var values = sensorData.map(function(sensor) {
-        return sensor.Value; // Using sensor values for y-axis
-    });
-
-    // Create the chart
-    var ctx = document.getElementById('sensorChart').getContext('2d');
-    var sensorChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels, // X-axis labels (dates)
-            datasets: [{
-                label: 'Sensor Values',
-                data: values, // Y-axis data (sensor values)
-                borderColor: 'rgb(75, 192, 192)', // Line color
-                fill: false // Do not fill under the line
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    type: 'category',
+                // Initialize and render each chart
+                var chart = new CanvasJS.Chart(chartContainer.id, {
+                    animationEnabled: true,
                     title: {
-                        display: true,
-                        text: 'Date and Time'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Sensor Value'
-                    }
-                }
+                        text: sensorType + " Sensor Data"
+                    },
+                    axisX: {
+                        title: "Date & Time",
+                        valueFormatString: "DD MMM hh:mm TT"
+                    },
+                    axisY: {
+                        title: sensorType + " Value",
+                        includeZero: false
+                    },
+                    data: [{
+                        type: "line",
+                        name: sensorType,
+                        showInLegend: true,
+                        dataPoints: dataPoints
+                    }]
+                });
+
+                chart.render();
             }
         }
-    });
-</script>
+    </script>    
+</head>
+
+<body>
+    <!-- Containers will be dynamically created for each sensor -->
+</body>

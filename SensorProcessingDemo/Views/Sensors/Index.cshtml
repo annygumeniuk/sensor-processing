@@ -1,11 +1,38 @@
 ﻿@model SensorProcessingDemo.Models.Sensor
 
-<head>    
+<head>
+    <style>
+        /* Grid styling for multiple charts */
+        .chart-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .chart-container {
+            flex: 1 1 45%; /* Adjusts chart width for responsiveness */
+            min-width: 300px;
+            max-width: 600px;
+            height: 300px;
+            border: 1px solid #ddd;
+            /* border-radius: 10px; */
+            padding: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+    </style>
+
     <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
     <script>
         window.onload = function () {
             // Parse the JSON data from the ViewBag
             var groupedData = JSON.parse('@Html.Raw(ViewBag.GroupedDataPoints)');
+
+            // Create a container for all charts
+            var chartGrid = document.createElement("div");
+            chartGrid.className = "chart-grid";
+            document.body.appendChild(chartGrid);
 
             // Loop through each sensor type and create a separate chart
             for (var sensorType in groupedData) {
@@ -16,31 +43,45 @@
                     };
                 });
 
-                // Create a new chart container for each sensor
+                // Create a chart container for each sensor type
                 var chartContainer = document.createElement("div");
+                chartContainer.className = "chart-container";
                 chartContainer.id = sensorType + "ChartContainer";
-                chartContainer.style.height = "300px"; // 370 works good
-                chartContainer.style.width = "98%";
-                document.body.appendChild(chartContainer); // Append to body or any other section
+                chartGrid.appendChild(chartContainer);
 
                 // Initialize and render each chart
                 var chart = new CanvasJS.Chart(chartContainer.id, {
+                    theme: "light2", // Choose a theme for better aesthetics
                     animationEnabled: true,
+                    exportEnabled: true, // Enable download options
+                    zoomEnabled: true,   // Enable zoom for detailed view
                     title: {
-                        text: sensorType + " Sensor Data"
+                        text: sensorType + " Sensor Data",
+                        fontSize: 20
                     },
                     axisX: {
                         title: "Date & Time",
-                        valueFormatString: "DD MMM hh:mm TT"
+                        valueFormatString: "DD MMM hh:mm TT",
+                        labelAngle: -45,
+                        labelFontSize: 12
                     },
                     axisY: {
                         title: sensorType + " Value",
-                        includeZero: false
+                        includeZero: false,
+                        gridThickness: 1,
+                        labelFontSize: 12
+                    },
+                    toolTip: {
+                        shared: true,
+                        content: "{name}: {y} at {x}"
                     },
                     data: [{
                         type: "line",
                         name: sensorType,
                         showInLegend: true,
+                        lineThickness: 2,
+                        markerType: "circle", // Adding marker to make points distinct
+                        markerSize: 8,
                         dataPoints: dataPoints
                     }]
                 });
@@ -48,9 +89,25 @@
                 chart.render();
             }
         }
-    </script>    
+    </script>
+
+    <script>
+        // Function to refresh the page every 10 seconds
+        setInterval(function() {
+            fetch(window.location.href) // Make a GET request to the current URL
+                .then(response => response.text())
+                .then(html => {
+                    // Replace the sensor data with the updated content
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newData = doc.querySelector('#sensor-data').innerHTML;
+
+                    document.querySelector('#sensor-data').innerHTML = newData;
+                });
+        }, 10000); // 10 seconds
+    </script>
 </head>
 
 <body>
-    <!-- Containers will be dynamically created for each sensor -->
+    <!-- Dynamic chart grid layout -->
 </body>

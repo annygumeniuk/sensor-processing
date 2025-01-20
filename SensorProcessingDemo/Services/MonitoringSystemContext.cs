@@ -13,5 +13,13 @@ namespace SensorProcessingDemo.Services
         public MonitoringSystemContext(DbContextOptions options) : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AlertCollector>()
+                .HasOne(ac => ac.Sensor)
+                .WithOne(s => s.AlertCollector)
+                .HasForeignKey<AlertCollector>(ac => ac.SensorId);
+        }
     }    
 }

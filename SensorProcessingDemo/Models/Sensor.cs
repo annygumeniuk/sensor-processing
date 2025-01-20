@@ -1,16 +1,22 @@
-﻿using SensorProcessingDemo.Attributes;
+﻿using Microsoft.EntityFrameworkCore;
+using SensorProcessingDemo.Attributes;
 using SensorProcessingDemo.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace SensorProcessingDemo.Models
 {
     public class Sensor
     {
+        [Key]
         public int     Id    { get; set; }
         public string  Name  { get; set; }
-        public decimal Value { get; set; }        
+                
+        public float Value { get; set; }        
         public DateTime dateTime { get; set; }
+        
+        public virtual AlertCollector? AlertCollector { get; set; }
 
-        public Sensor(int id, string name, decimal value, DateTime time)
+        public Sensor(int id, string name, float value, DateTime time)
         { 
             Id = id;
             Name = name;

@@ -1,12 +1,8 @@
 ﻿namespace SensorProcessingDemo.Common
 {
     public static class Constants
-    {
-        // LET`S IMAGINE ALL THIS CONSTS ARE FOR OPERATION ROOM
-
-        public const string TEMPERATURE = "Temperature";
-        public const string HUMIDITY    = "Humidity";
-        public const string LIGHTING    = "Lighting";
+    {                
+        public enum SENSORNAME { Temperature, Humidity, Lighting };
 
         // In °C 
         public const decimal TEMP_MIN   = 18.0m;

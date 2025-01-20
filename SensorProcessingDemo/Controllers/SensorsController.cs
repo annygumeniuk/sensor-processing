@@ -1,86 +1,71 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SensorProcessingDemo.Services;
-using SensorProcessingDemo.Models;
 using SensorProcessingDemo.Common;
-using SensorProcessingDemo.Attributes;
-using System.Globalization;
-using System.Security.Cryptography;
+using System.Collections.Concurrent;
 
 namespace SensorProcessingDemo.Controllers
 {
     public class SensorsController : Controller
-        {
-        private readonly Data _dataService;
+    {
+        private static readonly ConcurrentDictionary<string, List<(DateTime time, decimal value)>> SensorData =
+                new ConcurrentDictionary<string, List<(DateTime, decimal)>>();
 
-        public SensorsController(Data dataService)
-        {
-            _dataService = dataService;
-        }
+        public const int UpdateIntervalSeconds = 2; // Adjust as needed
+        private static readonly Random Random = new();
 
-        // [temp] Funtion to generate new id (untill we have a database)
-        public int RenderId()
-        {
-            return _dataService.sensors.Any() ? _dataService.sensors.Last().Id + 1 : 1;
-        }
-
-        // Function to generate sensors data        
-        public void GenerateSensorData(string name, decimal min, decimal max)
-        {
-            var sensor = new Sensor(RenderId(), name, RenderData(min, max), RenderDate());
-            _dataService.sensors.Add(sensor);
-
-            // Limit the data list to the last 100 records
-            if (_dataService.sensors.Count > 100)
+        private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
+            new Dictionary<string, (decimal min, decimal max)>
             {
-                _dataService.sensors.RemoveAt(0);
-            }                        
+                { "Temperature", (Constants.TEMP_MIN, Constants.TEMP_MAX) },
+                { "Humidity", (Constants.HUM_MIN, Constants.HUM_MAX) },
+                { "Lighting", (Constants.LIGHT_MIN, Constants.LIGHT_MAX) }
+            };
+
+        public SensorsController()
+        {
+            if (!isRunning)
+            {
+                isRunning = true;
+                Task.Run(GenerateSensorDataLoop);
+            }
+        }
+        
+        [HttpGet("get-sensor-data")]
+        public JsonResult GetSensorData()
+        {
+            return Json(SensorData.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Select(v => new { v.time, v.value }).ToList()));
         }
 
-        // Function to generate random data for a sensor
-        public decimal RenderData(decimal min, decimal max)
-        {
-            var generator = new Random();
-            decimal value = new decimal(generator.NextDouble() * ((double)max - (double)min) + (double)min);
-            return value;
-        }
-
-        // Function to render current date and convert it to needed format
-        public DateTime RenderDate()
-        {
-            return DateTime.Now;
-        }
+        private static bool isRunning = false;
+       
 
         public IActionResult Index()
         {
-            // Generate sensor data for different sensor types
-            GenerateSensorData(Common.Constants.TEMPERATURE, Common.Constants.TEMP_MIN, Common.Constants.TEMP_MAX);
-            GenerateSensorData(Common.Constants.HUMIDITY, Common.Constants.HUM_MIN, Common.Constants.HUM_MAX);
-            GenerateSensorData(Common.Constants.LIGHTING, Common.Constants.LIGHT_MIN, Common.Constants.LIGHT_MAX);
-
-            // Group sensors by Name and serialize data for the view
-            var groupedData = _dataService.sensors
-                .GroupBy(s => s.Name)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(x => new { timeGenerated = x.dateTime, x.Value }).ToList()
-                );
-
-            ViewBag.GroupedDataPoints = System.Text.Json.JsonSerializer.Serialize(groupedData);
             return View();
         }
 
-        // API endpoint to get sensor data as JSON
-        [Route("api/sensors/data")]
-        [HttpGet]
-        public IActionResult GetSensorData()
-        {       
-            var groupedData = _dataService.sensors
-              .GroupBy(s => s.Name)
-              .ToDictionary(
-                  g => g.Key,
-                  g => g.Select(x => new { dateTime = x.dateTime, x.Value }).ToList()
-              );       
-            return Json(groupedData);
+        public async Task GenerateSensorDataLoop()
+        {
+            while (true)
+            {
+                foreach (var sensor in SensorRanges.Keys)
+                {
+                    var range = SensorRanges[sensor];
+                    var value = Math.Round((decimal)(Random.NextDouble() * (double)(range.max - range.min)) + range.min, 2);
+
+                    if (!SensorData.ContainsKey(sensor))
+                        SensorData[sensor] = new List<(DateTime, decimal)>();
+
+                    // Limit number of points for scrolling effect
+                    if (SensorData[sensor].Count > 100)
+                        SensorData[sensor].RemoveAt(0);
+
+                    SensorData[sensor].Add((DateTime.Now, value));
+                }
+
+                await Task.Delay(UpdateIntervalSeconds * 1000);
+            }
         }
     }
 }

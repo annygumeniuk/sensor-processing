@@ -1,128 +1,51 @@
-﻿@model SensorProcessingDemo.Models.Sensor
+﻿@{
+    ViewData["Title"] = "Sensor Dashboard";
+}
 
-<head>
-    <style>
-        .chart-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<h1>Real-Time Sensor Dashboard</h1>
+<div id="charts-container" style="display: flex; flex-direction: column; gap: 20px;">
+    <div id="temperatureChart" style="height: 300px; width: 100%;"></div>
+    <div id="humidityChart" style="height: 300px; width: 100%;"></div>
+    <div id="lightingChart" style="height: 300px; width: 100%;"></div>
+</div>
 
-        .chart-container {
-            flex: 1 1 45%; /* Adjusts chart width for responsiveness */
-            min-width: 300px;
-            max-width: 600px;
-            height: 300px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #f9f9f9;
-        }
-    </style>
+<script>
+    const updateInterval = @SensorProcessingDemo.Controllers.SensorsController.UpdateIntervalSeconds * 1000;
 
-    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-    <script>
-        let charts = {}; // Store chart instances by sensor type
+    const charts = {
+        Temperature: new CanvasJS.Chart("temperatureChart", {
+            title: { text: "Temperature (°C)" },
+            axisY: { title: "Value", includeZero: false },
+            data: [{ type: "line", dataPoints: [] }]
+        }),
+        Humidity: new CanvasJS.Chart("humidityChart", {
+            title: { text: "Humidity (%)" },
+            axisY: { title: "Value", includeZero: false },
+            data: [{ type: "line", dataPoints: [] }]
+        }),
+        Lighting: new CanvasJS.Chart("lightingChart", {
+            title: { text: "Lighting (lx)" },
+            axisY: { title: "Value", includeZero: false },
+            data: [{ type: "line", dataPoints: [] }]
+        })
+    };
 
-        window.onload = function () {
-            // Initial rendering of the charts
-            loadCharts();
+    function fetchSensorData() {
+        fetch('/get-sensor-data')
+            .then(response => response.json())
+            .then(data => {
+                Object.keys(data).forEach(sensor => {
+                    const points = data[sensor].map(({ time, value }) => ({
+                        x: new Date(time),
+                        y: value
+                    }));
+                    charts[sensor].options.data[0].dataPoints = points;
+                    charts[sensor].render();
+                });
+            });
+    }
 
-            // Set an interval to refresh the charts every 5 seconds
-            setInterval(refreshCharts, 5000);
-        };
-
-        function loadCharts() {
-            const groupedData = JSON.parse('@Html.Raw(ViewBag.GroupedDataPoints)');
-            const chartGrid = document.querySelector(".chart-grid");
-
-            // Loop through grouped data and create a chart for each sensor type
-            for (const sensorType in groupedData) {
-                const dataPoints = groupedData[sensorType].map(point => ({
-                    x: new Date(point.timeGenerated).toLocaleTimeString(),
-                    y: point.Value,
-                }));
-
-                // If the chart doesn't exist, create it
-                if (!charts[sensorType]) {
-                    const chartContainer = document.createElement("div");
-                    chartContainer.className = "chart-container";
-                    chartContainer.id = `${sensorType}ChartContainer`;
-                    chartGrid.appendChild(chartContainer);
-
-                    const chart = new CanvasJS.Chart(chartContainer.id, {
-                        theme: "light2",
-                        animationEnabled: true,
-                        exportEnabled: true,
-                        zoomEnabled: true,
-                        title: {
-                            text: `${sensorType} Sensor Data`,
-                            fontSize: 20,
-                        },
-                        axisX: {
-                            title: "Date & Time",
-                            valueFormatString: "DD MMM hh:mm TT",
-                            labelAngle: -45,
-                            labelFontSize: 12,
-                        },
-                        axisY: {
-                            title: `${sensorType} Value`,
-                            includeZero: false,
-                            gridThickness: 1,
-                            labelFontSize: 12,
-                        },
-                        data: [{
-                            type: "line",
-                            name: sensorType,
-                            showInLegend: true,
-                            lineThickness: 2,
-                            markerType: "circle",
-                            markerSize: 8,
-                            dataPoints: dataPoints,
-                        }],
-                    });
-
-                    chart.render();
-                    charts[sensorType] = chart; // Store the chart instance for later updates
-                }
-            }
-        }
-
-        function refreshCharts() {
-            console.log("Refreshing charts...");
-            fetch('/api/sensors/data')
-                .then(response => response.json())
-                .then(groupedData => {
-                    console.log("Fetched Data:", groupedData);
-
-                    for (const sensorType in groupedData) {
-                        const newDataPoints = groupedData[sensorType].map(point => ({
-                            x: new Date(point.timeGenerated).toLocaleTimeString(),
-                            y: point.Value,
-                        }));
-
-                        if (charts[sensorType]) {
-                            const chart = charts[sensorType];
-
-                            // Append new data points while keeping only the last 100
-                            const currentData = chart.options.data[0].dataPoints;
-                            const mergedData = currentData.concat(newDataPoints).slice(-100);
-
-                            chart.options.data[0].dataPoints = mergedData;
-                            chart.render();
-                        } else {
-                            console.warn(`Chart for ${sensorType} not found`);
-                        }
-                    }
-                })
-                .catch(error => console.error("Error refreshing charts:", error));
-        }
-    </script>
-
-</head>
-
-<body>
-    <!-- Dynamic chart grid layout -->
-    <div class="chart-grid"></div>
-</body>
+    setInterval(fetchSensorData, updateInterval);
+    fetchSensorData();
+</script>

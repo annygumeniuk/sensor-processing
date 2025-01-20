@@ -8,9 +8,9 @@ namespace SensorProcessingDemo.Controllers
     {
         private static readonly ConcurrentDictionary<string, List<(DateTime time, decimal value)>> SensorData =
                 new ConcurrentDictionary<string, List<(DateTime, decimal)>>();
-
-        public const int UpdateIntervalSeconds = 2; // Adjust as needed
+        
         private static readonly Random Random = new();
+        private static bool isRunning = false;
 
         private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
             new Dictionary<string, (decimal min, decimal max)>
@@ -28,22 +28,19 @@ namespace SensorProcessingDemo.Controllers
                 Task.Run(GenerateSensorDataLoop);
             }
         }
-        
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [HttpGet("get-sensor-data")]
         public JsonResult GetSensorData()
         {
             return Json(SensorData.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.Select(v => new { v.time, v.value }).ToList()));
-        }
-
-        private static bool isRunning = false;
-       
-
-        public IActionResult Index()
-        {
-            return View();
-        }
+        }               
 
         public async Task GenerateSensorDataLoop()
         {
@@ -64,7 +61,7 @@ namespace SensorProcessingDemo.Controllers
                     SensorData[sensor].Add((DateTime.Now, value));
                 }
 
-                await Task.Delay(UpdateIntervalSeconds * 1000);
+                await Task.Delay(Common.Constants.UpdateIntervalSeconds * 1000);
             }
         }
     }

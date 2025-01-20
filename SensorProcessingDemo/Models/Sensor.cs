@@ -10,7 +10,6 @@ namespace SensorProcessingDemo.Models
         public decimal Value { get; set; }        
         public DateTime dateTime { get; set; }
 
-
         public Sensor(int id, string name, decimal value, DateTime time)
         { 
             Id = id;
@@ -19,12 +18,6 @@ namespace SensorProcessingDemo.Models
             dateTime = time;
         }
 
-        public Sensor() { }
-
-       //  Method to check if generated value is in range
-        public bool CheckBounds(decimal min, decimal max, decimal value)
-        {
-            return (value >= min && value <= max);            
-        }       
+        public Sensor() { }   
     }
 }

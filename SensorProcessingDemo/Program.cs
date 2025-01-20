@@ -1,10 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using SensorProcessingDemo.Repositories.Implementations;
+using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
 
 builder.Services.AddDbContext<MonitoringSystemContext>(options =>
     options.UseSqlServer("Server=(local)\\sqlexpress;Database=MonitoringSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True")

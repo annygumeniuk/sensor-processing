@@ -1,15 +1,24 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using SensorProcessingDemo.Auth;
 using SensorProcessingDemo.Repositories.Implementations;
 using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
-// Add services to the container.
+
+builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
+var jwtOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>();
+
+builder.Services.AddApiAuthAuthentification(configuration, jwtOptions);
 builder.Services.AddDbContext<MonitoringSystemContext>(options =>
     options.UseSqlServer("Server=(local)\\sqlexpress;Database=MonitoringSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True")
 );
@@ -18,9 +27,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
-{
-    //app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+{    
     app.UseHsts();
 }
 
@@ -29,10 +36,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Sensors}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services;
+using System.Linq.Expressions;
 namespace SensorProcessingDemo.Repositories.Implementations
 {
     public class EntityRepository<T> : IEntityRepository<T> where T : class
@@ -33,6 +34,11 @@ namespace SensorProcessingDemo.Repositories.Implementations
             }
         }
 
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
@@ -42,7 +48,7 @@ namespace SensorProcessingDemo.Repositories.Implementations
         {
             return await _dbSet.FindAsync(id);
         }
-
+       
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

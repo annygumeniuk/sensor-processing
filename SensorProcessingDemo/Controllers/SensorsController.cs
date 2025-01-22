@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SensorProcessingDemo.Common;
 using System.Collections.Concurrent;
 
 namespace SensorProcessingDemo.Controllers
 {
+    [Authorize]
     public class SensorsController : Controller
     {
         private static readonly ConcurrentDictionary<string, List<(DateTime time, decimal value)>> SensorData =

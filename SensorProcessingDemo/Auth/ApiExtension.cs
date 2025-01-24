@@ -37,6 +37,10 @@ namespace SensorProcessingDemo.Auth
                             return Task.CompletedTask;
                         }
                     };
+                }).AddCookie("Cookies", options =>
+                {
+                    options.Cookie.Name = "tasty-cookies";
+                    options.SlidingExpiration = true;
                 });
 
             services.AddAuthorization();

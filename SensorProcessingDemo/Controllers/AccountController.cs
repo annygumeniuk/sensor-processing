@@ -23,22 +23,10 @@ namespace SensorProcessingDemo.Controllers
             _jwtProvider = jwtProvider;
         }
 
-        private async Task Authenticate(string userName)
+        private void Authenticate(User user)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
-            };
-
-            var id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-        }
-
-
-        public IActionResult Index(string? firstName)
-        {
-            ViewBag.FirstName = !string.IsNullOrWhiteSpace(firstName) ? firstName : "Login or register";
-            return View();
+            var token = _jwtProvider.GenerateToken(user);
+            HttpContext.Response.Cookies.Append("tasty-cookies", token);
         }
 
         [HttpGet]
@@ -59,9 +47,9 @@ namespace SensorProcessingDemo.Controllers
             await _userRepo.AddAsync(newUser);
             await _userRepo.SaveAsync();
 
-            await Authenticate(newUser.Email);
+            Authenticate(newUser);
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -74,24 +62,22 @@ namespace SensorProcessingDemo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {                        
-            var user = (await _userRepo.FindAsync(u => u.Email == email && u.Password == password)).FirstOrDefault();
+            var user = (await _userRepo.
+                FindAsync(u => u.Email == email && u.Password == password)).
+                FirstOrDefault();
+
             if (user != null)
             {
-                var token = _jwtProvider.GenerateToken(user);
+                Authenticate(user);
 
-                HttpContext.Response.Cookies.Append("tasty-cookies", token);
-
-                return View("Index");
+                return RedirectToAction("Index", "Home");
             }
-            else 
-            {
-                throw new Exception();
-            }
+            return BadRequest();
         }
 
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Response.Cookies.Delete("tasty-cookies");
             return RedirectToAction("Login", "Account");
         }
     }

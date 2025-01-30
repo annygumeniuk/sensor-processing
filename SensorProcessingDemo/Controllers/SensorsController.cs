@@ -42,16 +42,35 @@ namespace SensorProcessingDemo.Controllers
             return Json(SensorData.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.Select(v => new { v.time, v.value }).ToList()));
-        }               
+        }
 
-        public async Task GenerateSensorDataLoop()
+        public bool CheckIfValueInRange(decimal value, decimal max, decimal min)
+        { 
+            return value <= max && value >= min;
+        }
+
+        public void AddAlertRecord(decimal value, decimal max, decimal min)
         {
+            bool isInRange = CheckIfValueInRange(value, max, min);
+
+            if (!isInRange)
+            {
+                // TODO: Add record to alert collector
+            }
+        }
+
+        public async Task GenerateSensorDataLoop()  
+        {
+            int counter = 0;
             while (true)
             {
                 foreach (var sensor in SensorRanges.Keys)
                 {
+                    counter++;
+                    
                     var range = SensorRanges[sensor];
                     var value = Math.Round((decimal)(Random.NextDouble() * (double)(range.max - range.min)) + range.min, 2);
+
 
                     if (!SensorData.ContainsKey(sensor))
                         SensorData[sensor] = new List<(DateTime, decimal)>();
@@ -59,6 +78,12 @@ namespace SensorProcessingDemo.Controllers
                     // Limit number of points for scrolling effect
                     if (SensorData[sensor].Count > 100)
                         SensorData[sensor].RemoveAt(0);
+
+                    // To generate a value which is out of the range
+                    if (counter == 10)
+                        value = range.max + 10;
+
+                    AddAlertRecord(value, range.max, range.min);
 
                     SensorData[sensor].Add((DateTime.Now, value));
                 }

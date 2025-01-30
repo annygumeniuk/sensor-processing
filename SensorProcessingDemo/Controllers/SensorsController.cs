@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SensorProcessingDemo.Common;
+using SensorProcessingDemo.Repositories.Interfaces;
 using System.Collections.Concurrent;
+using SensorProcessingDemo.Models;
+using SensorProcessingDemo.Services.Interfaces;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -13,6 +16,11 @@ namespace SensorProcessingDemo.Controllers
         
         private static readonly Random Random = new();
         private static bool isRunning = false;
+        
+        private readonly IEntityRepository<Monitoring> _monitoringContext;
+        private readonly IEntityRepository<Sensor> _sensorContext;       
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IMonitoringService _monitoringService;
 
         private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
             new Dictionary<string, (decimal min, decimal max)>
@@ -22,12 +30,25 @@ namespace SensorProcessingDemo.Controllers
                 { "Lighting", (Constants.LIGHT_MIN, Constants.LIGHT_MAX) }
             };
 
-        public SensorsController()
+        public SensorsController(ICurrentUserService currentUserService, IMonitoringService service)
         {
-            if (!isRunning)
+            _currentUserService = currentUserService;
+            _monitoringService = service;
+
+            if (isRunning)
             {
-                isRunning = true;
+                int userId = Convert.ToInt32(_currentUserService.GetUserId());
+                var isExist = _monitoringService.ExistWithUserId(userId);
+                if (!isExist)
+                {
+                    _monitoringService.StartMonitoring(userId);
+                }
+
                 Task.Run(GenerateSensorDataLoop);
+            }
+            else
+            {
+                
             }
         }
 
@@ -60,7 +81,7 @@ namespace SensorProcessingDemo.Controllers
         }
 
         public async Task GenerateSensorDataLoop()  
-        {
+        {                       
             int counter = 0;
             while (true)
             {

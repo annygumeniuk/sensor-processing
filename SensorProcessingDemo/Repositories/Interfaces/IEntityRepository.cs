@@ -6,6 +6,7 @@ namespace SensorProcessingDemo.Repositories.Interfaces
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        Task<T> GetFirstOrDefault(Expression<Func<T, bool>> predicate);
         Task<T> GetByIdAsync(object id);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);

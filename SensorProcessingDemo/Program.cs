@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SensorProcessingDemo.Auth;
 using SensorProcessingDemo.Repositories.Implementations;
 using SensorProcessingDemo.Repositories.Interfaces;
+using SensorProcessingDemo.Services.Interfaces;
+using SensorProcessingDemo.Services.Implementations;
 using SensorProcessingDemo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +13,11 @@ var configuration = builder.Configuration;
 
 builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 var jwtOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>();
 

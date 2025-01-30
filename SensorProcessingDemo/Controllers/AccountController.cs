@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SensorProcessingDemo.Repositories.Implementations;
-using SensorProcessingDemo.Services;
-using System.Diagnostics;
 using SensorProcessingDemo.Models;
 using SensorProcessingDemo.Repositories.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
 using SensorProcessingDemo.Auth;
 
 namespace SensorProcessingDemo.Controllers

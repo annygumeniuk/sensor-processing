@@ -43,6 +43,13 @@ namespace SensorProcessingDemo.Services.Implementations
             return record != null;
         }
 
+        public async Task<Monitoring> CurrentExistWithUserId(int userId)
+        {
+            var record = await _monitoringContext.GetFirstOrDefault(x => x.UserId == userId && x.MonitoringStartedAt == x.MonitoringStoppedAt);
+
+            return record != null ? record : null;
+        }
+
         public Task GetByUserId(int userId)
         {
             return _monitoringContext.FindAsync(x => x.UserId == userId);

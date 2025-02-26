@@ -8,5 +8,6 @@ namespace SensorProcessingDemo.Services.Interfaces
         void StartMonitoring(int userId);
         Task StopMonitoring(int userId);
         bool ExistWithUserId(int userId);
+        Task<Monitoring> CurrentExistWithUserId(int userId);
     }
 }

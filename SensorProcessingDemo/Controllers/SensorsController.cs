@@ -33,13 +33,16 @@ namespace SensorProcessingDemo.Controllers
         public SensorsController(ICurrentUserService currentUserService, IMonitoringService service)
         {
             _currentUserService = currentUserService;
-            _monitoringService = service;
+            _monitoringService = service;            
+        }
 
+        public void Run()
+        {
             if (isRunning)
             {
                 int userId = Convert.ToInt32(_currentUserService.GetUserId());
-                var isExist = _monitoringService.ExistWithUserId(userId);
-                if (!isExist)
+                var isExist = _monitoringService.CurrentExistWithUserId(userId);
+                if (isExist == null)
                 {
                     _monitoringService.StartMonitoring(userId);
                 }
@@ -48,7 +51,7 @@ namespace SensorProcessingDemo.Controllers
             }
             else
             {
-                
+
             }
         }
 

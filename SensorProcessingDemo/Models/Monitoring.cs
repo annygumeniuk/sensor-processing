@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SensorProcessingDemo.Models
 {
+    [Table("Monitoring")]
     public class Monitoring
     {
         [Key]

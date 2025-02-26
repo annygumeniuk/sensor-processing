@@ -2,9 +2,11 @@
 using SensorProcessingDemo.Attributes;
 using SensorProcessingDemo.Common;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SensorProcessingDemo.Models
 {
+    [Table("Sensor")]
     public class Sensor
     {
         [Key]

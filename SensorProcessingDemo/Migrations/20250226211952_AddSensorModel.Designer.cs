@@ -12,8 +12,8 @@ using SensorProcessingDemo.Services;
 namespace SensorProcessingDemo.Migrations
 {
     [DbContext(typeof(MonitoringSystemContext))]
-    [Migration("20250120203241_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250226211952_AddSensorModel")]
+    partial class AddSensorModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,12 +27,21 @@ namespace SensorProcessingDemo.Migrations
 
             modelBuilder.Entity("SensorProcessingDemo.Models.AlertCollector", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("SensorId")
                         .HasColumnType("int");
 
-                    b.HasKey("SensorId");
+                    b.HasKey("Id");
 
-                    b.ToTable("AlertsCollector");
+                    b.HasIndex("SensorId")
+                        .IsUnique();
+
+                    b.ToTable("AlertCollector");
                 });
 
             modelBuilder.Entity("SensorProcessingDemo.Models.Monitoring", b =>
@@ -54,7 +63,7 @@ namespace SensorProcessingDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Monitorings");
+                    b.ToTable("Monitoring");
                 });
 
             modelBuilder.Entity("SensorProcessingDemo.Models.Sensor", b =>
@@ -69,15 +78,20 @@ namespace SensorProcessingDemo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(10, 2)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("dateTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sensors");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sensor");
                 });
 
             modelBuilder.Entity("SensorProcessingDemo.Models.User", b =>
@@ -107,7 +121,7 @@ namespace SensorProcessingDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("SensorProcessingDemo.Models.AlertCollector", b =>
@@ -119,6 +133,17 @@ namespace SensorProcessingDemo.Migrations
                         .IsRequired();
 
                     b.Navigation("Sensor");
+                });
+
+            modelBuilder.Entity("SensorProcessingDemo.Models.Sensor", b =>
+                {
+                    b.HasOne("SensorProcessingDemo.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SensorProcessingDemo.Models.Sensor", b =>

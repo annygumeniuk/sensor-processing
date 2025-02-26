@@ -24,10 +24,19 @@ namespace SensorProcessingDemo.Migrations
 
             modelBuilder.Entity("SensorProcessingDemo.Models.AlertCollector", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("SensorId")
                         .HasColumnType("int");
 
-                    b.HasKey("SensorId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId")
+                        .IsUnique();
 
                     b.ToTable("AlertCollector");
                 });

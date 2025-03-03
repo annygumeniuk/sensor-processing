@@ -38,8 +38,7 @@ namespace SensorProcessingDemo.Controllers
                 return View(newUser);
             }
             
-            await _userRepo.AddAsync(newUser);
-            await _userRepo.SaveAsync();
+            await _userRepo.AddAsync(newUser);            
 
             Authenticate(newUser);
 

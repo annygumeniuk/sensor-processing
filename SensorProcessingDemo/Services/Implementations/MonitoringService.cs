@@ -1,5 +1,4 @@
-﻿using SensorProcessingDemo.Controllers;
-using SensorProcessingDemo.Models;
+﻿using SensorProcessingDemo.Models;
 using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services.Interfaces;
 
@@ -16,10 +15,10 @@ namespace SensorProcessingDemo.Services.Implementations
             _logger = logger;
         }
 
-        public void StartMonitoring(int userId)
+        public async Task StartMonitoring(int userId)
         {
             _logger.LogInformation("Trying to start the monitoring.");
-            
+
             Monitoring monitoring = new Monitoring()
             {
                 UserId = userId,
@@ -27,39 +26,48 @@ namespace SensorProcessingDemo.Services.Implementations
                 MonitoringStoppedAt = null,
             };
 
-            _monitoringContext.AddAsync(monitoring);
-            _monitoringContext.SaveAsync();
-
-            _logger.LogInformation("Monitoring was started.");            
+            _logger.LogInformation($"Monitoring started at {monitoring.MonitoringStartedAt} by user {userId}.");
+            await _monitoringContext.AddAsync(monitoring);
+            _logger.LogInformation("Monitoring data was added to db.");
         }
 
         public async Task StopMonitoring(int userId)
-        {            
+        {
             var record = await _monitoringContext.GetFirstOrDefault(x => x.UserId == userId && x.MonitoringStoppedAt == null);
 
             if (record != null)
-            {                
-                record.MonitoringStoppedAt = DateTime.Now;             
-                await _monitoringContext.SaveAsync();
+            {
+                record.MonitoringStoppedAt = DateTime.Now;
+                await _monitoringContext.UpdateAsync(record);
             }
         }
 
-        public bool ExistWithUserId(int userId)
+        public async Task<IEnumerable<Monitoring>> GetByUserId(int userId)
         {
-            var record = GetByUserId(userId);
-            return record != null;
+            return await _monitoringContext.FindAsync(x => x.UserId == userId);
         }
 
         public async Task<Monitoring?> CurrentExistWithUserId(int userId)
         {
-            var record = await _monitoringContext.GetFirstOrDefault(x => x.UserId == userId && x.MonitoringStartedAt == x.MonitoringStoppedAt);
-
-            return record != null ? record : null;
+            try
+            {
+                return await _monitoringContext.GetFirstOrDefault(x => x.UserId == userId && x.MonitoringStoppedAt == null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in CurrentExistWithUserId: {ex.Message}");
+                return null;
+            }
         }
 
-        public Task GetByUserId(int userId)
+        Task IMonitoringService.GetByUserId(int userId)
         {
-            return _monitoringContext.FindAsync(x => x.UserId == userId);
+            throw new NotImplementedException();
+        }
+
+        public bool ExistWithUserId(int userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

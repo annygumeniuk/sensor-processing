@@ -2,62 +2,71 @@
 using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services;
 using System.Linq.Expressions;
+
 namespace SensorProcessingDemo.Repositories.Implementations
 {
     public class EntityRepository<T> : IEntityRepository<T> where T : class
     {
-        private readonly MonitoringSystemContext _context;
-        private readonly DbSet<T> _dbSet;
+        private readonly IDbContextFactory<MonitoringSystemContext> _contextFactory;
 
-        public EntityRepository(MonitoringSystemContext context)
-        { 
-            _context = context;
-            _dbSet = context.Set<T>();
+        public EntityRepository(IDbContextFactory<MonitoringSystemContext> contextFactory)
+        {
+            _contextFactory = contextFactory;
         }
 
         public async Task AddAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
+            await using var context = _contextFactory.CreateDbContext();
+            await context.Set<T>().AddAsync(entity);
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
-            _dbSet.Update(entity);
+            await using var context = _contextFactory.CreateDbContext();
+            context.Set<T>().Update(entity);
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(object id)
         {
+            await using var context = _contextFactory.CreateDbContext();
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
-                _dbSet.Remove(entity);
+                context.Set<T>().Remove(entity);
+                await context.SaveChangesAsync();
             }
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _dbSet.Where(predicate).ToListAsync();
+            await using var context = _contextFactory.CreateDbContext();
+            return await context.Set<T>().Where(predicate).ToListAsync();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            await using var context = _contextFactory.CreateDbContext();
+            return await context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetFirstOrDefault(Expression<Func<T, bool>> predicate)
+        public async Task<T?> GetFirstOrDefault(Expression<Func<T, bool>> predicate)
         {
-            return await _dbSet.FirstOrDefaultAsync(predicate);
+            await using var context = _contextFactory.CreateDbContext();
+            return await context.Set<T>().FirstOrDefaultAsync(predicate);
         }
 
-
-        public async Task<T> GetByIdAsync(object id)
+        public async Task<T?> GetByIdAsync(object id)
         {
-            return await _dbSet.FindAsync(id);
+            await using var context = _contextFactory.CreateDbContext();
+            return await context.Set<T>().FindAsync(id);
         }
-       
-        public async Task SaveAsync()
+
+        public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
-        }       
+            await using var context = _contextFactory.CreateDbContext();
+            await context.SaveChangesAsync();
+        }
     }
 }

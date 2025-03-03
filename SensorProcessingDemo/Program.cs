@@ -6,6 +6,7 @@ using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services.Interfaces;
 using SensorProcessingDemo.Services.Implementations;
 using SensorProcessingDemo.Services;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -23,9 +24,8 @@ builder.Services.AddScoped<IMonitoringService, MonitoringService>();
 var jwtOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>();
 
 builder.Services.AddApiAuthAuthentification(configuration, jwtOptions);
-builder.Services.AddDbContext<MonitoringSystemContext>(options =>
-    options.UseSqlServer("Server=(local)\\sqlexpress;Database=MonitoringSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True")
-);
+builder.Services.AddDbContextFactory<MonitoringSystemContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

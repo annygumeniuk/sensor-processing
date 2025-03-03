@@ -43,34 +43,60 @@ namespace SensorProcessingDemo.Controllers
         }
 
         [HttpPost("toggle-monitoring")]
-        public JsonResult ToggleMonitoring()
+        public async Task<JsonResult> ToggleMonitoring()
         {
             isRunning = !isRunning;
 
             if (isRunning)
             {
-                Run();
+                await Run();
             }
 
             return Json(new { isRunning });
-        }   
+        }
 
-        public void Run()
-        {            
+        public async Task Run()
+        {
+            int userId = Convert.ToInt32(_currentUserService.GetUserId());
+
+            var isExist = await _monitoringService.CurrentExistWithUserId(userId);
+
             if (isRunning)
             {
-                int userId = Convert.ToInt32(_currentUserService.GetUserId());
-                var isExist = _monitoringService.CurrentExistWithUserId(userId);
                 if (isExist == null)
                 {
-                    _monitoringService.StartMonitoring(userId);
+                    await _monitoringService.StartMonitoring(userId);
+                    _ = Task.Run(async () => await GenerateSensorDataLoop()); // Запускаємо фонову задачу
                 }
-
-                Task.Run(GenerateSensorDataLoop);
             }
             else
             {
+                if (isExist != null)
+                {
+                    await _monitoringService.StopMonitoring(userId);
+                }
+            }
+        }
 
+        public async Task GenerateSensorDataLoop()
+        {
+            while (isRunning)
+            {
+                foreach (var sensor in SensorRanges.Keys)
+                {
+                    var range = SensorRanges[sensor];
+                    var value = Math.Round((decimal)(Random.NextDouble() * (double)(range.max - range.min)) + range.min, 2);
+
+                    if (!SensorData.ContainsKey(sensor))
+                        SensorData[sensor] = new List<(DateTime, decimal)>();
+
+                    if (SensorData[sensor].Count > 100)
+                        SensorData[sensor].RemoveAt(0);
+
+                    SensorData[sensor].Add((DateTime.Now, value));
+                }
+
+                await Task.Delay(Common.Constants.UpdateIntervalSeconds * 1000);
             }
         }
 
@@ -101,39 +127,6 @@ namespace SensorProcessingDemo.Controllers
             {
                 // TODO: Add record to alert collector
             }
-        }
-
-        public async Task GenerateSensorDataLoop()  
-        {                       
-            int counter = 0;
-            while (true)
-            {
-                foreach (var sensor in SensorRanges.Keys)
-                {
-                    counter++;
-                    
-                    var range = SensorRanges[sensor];
-                    var value = Math.Round((decimal)(Random.NextDouble() * (double)(range.max - range.min)) + range.min, 2);
-
-
-                    if (!SensorData.ContainsKey(sensor))
-                        SensorData[sensor] = new List<(DateTime, decimal)>();
-
-                    // Limit number of points for scrolling effect
-                    if (SensorData[sensor].Count > 100)
-                        SensorData[sensor].RemoveAt(0);
-
-                    // To generate a value which is out of the range
-                    if (counter == 10)
-                        value = range.max + 10;
-
-                    AddAlertRecord(value, range.max, range.min);
-
-                    SensorData[sensor].Add((DateTime.Now, value));
-                }
-
-                await Task.Delay(Common.Constants.UpdateIntervalSeconds * 1000);
-            }
-        }
+        }       
     }
 }

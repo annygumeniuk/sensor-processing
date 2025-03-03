@@ -30,14 +30,33 @@ namespace SensorProcessingDemo.Controllers
                 { "Lighting", (Constants.LIGHT_MIN, Constants.LIGHT_MAX) }
             };
 
-        public SensorsController(ICurrentUserService currentUserService, IMonitoringService service)
+        public SensorsController(
+            IEntityRepository<Monitoring> monitoringContext,
+            IEntityRepository<Sensor> sensorContext,
+            ICurrentUserService currentUserService,
+            IMonitoringService monitoringService)
         {
+            _monitoringContext = monitoringContext;
+            _sensorContext = sensorContext;
             _currentUserService = currentUserService;
-            _monitoringService = service;            
+            _monitoringService = monitoringService;
         }
 
-        public void Run()
+        [HttpPost("toggle-monitoring")]
+        public JsonResult ToggleMonitoring()
         {
+            isRunning = !isRunning;
+
+            if (isRunning)
+            {
+                Run();
+            }
+
+            return Json(new { isRunning });
+        }   
+
+        public void Run()
+        {            
             if (isRunning)
             {
                 int userId = Convert.ToInt32(_currentUserService.GetUserId());
@@ -57,6 +76,7 @@ namespace SensorProcessingDemo.Controllers
 
         public IActionResult Index()
         {
+            Run();
             return View();
         }
 

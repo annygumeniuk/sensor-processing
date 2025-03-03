@@ -4,6 +4,12 @@
 
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 <h1>Real-Time Sensor Dashboard</h1>
+
+<button id="toggleMonitoringBtn" onclick="toggleMonitoring()">Start Monitoring</button>
+<div id="sensorData">
+    <p>Loading sensor data...</p>
+</div>
+
 <div id="charts-container" style="display: flex; flex-direction: column; gap: 20px;">
     <div id="temperatureChart" style="height: 300px; width: 100%;"></div>
     <div id="humidityChart" style="height: 300px; width: 100%;"></div>
@@ -11,6 +17,21 @@
 </div>
 
 <script>
+
+    async function toggleMonitoring() {
+        try {
+            const response = await fetch('/toggle-monitoring', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json();
+            document.getElementById("toggleMonitoringBtn").innerText = data.isRunning ? "Stop Monitoring" : "Start Monitoring";
+        } catch (error) {
+            console.error("Error toggling monitoring", error);
+        }
+    }
+
     const updateInterval = @SensorProcessingDemo.Common.Constants.UpdateIntervalSeconds * 1000;
 
     const charts = {

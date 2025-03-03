@@ -10,6 +10,6 @@ namespace SensorProcessingDemo.Models
         public int Id { get; set; }
         public int UserId { get; set; }
         public DateTime MonitoringStartedAt { get; set; }
-        public DateTime MonitoringStoppedAt { get; set; }
+        public DateTime? MonitoringStoppedAt { get; set; }
     }
 }

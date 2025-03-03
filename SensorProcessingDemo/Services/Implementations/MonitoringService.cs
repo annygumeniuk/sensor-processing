@@ -69,5 +69,11 @@ namespace SensorProcessingDemo.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<Monitoring>> GetAllActiveMonitorings()
+        {
+            return await _monitoringContext.FindAsync(x => x.MonitoringStoppedAt == null);
+        }
+
     }
 }

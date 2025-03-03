@@ -45,15 +45,24 @@ namespace SensorProcessingDemo.Controllers
         [HttpPost("toggle-monitoring")]
         public async Task<JsonResult> ToggleMonitoring()
         {
+            int userId = Convert.ToInt32(_currentUserService.GetUserId());
+
             isRunning = !isRunning;
 
             if (isRunning)
             {
-                await Run();
+                SensorData.Clear(); // clear previous data
+                await _monitoringService.StartMonitoring(userId);
+                _ = Task.Run(async () => await GenerateSensorDataLoop());
+            }
+            else
+            {
+                await _monitoringService.StopMonitoring(userId);
             }
 
             return Json(new { isRunning });
         }
+
 
         public async Task Run()
         {
@@ -66,7 +75,7 @@ namespace SensorProcessingDemo.Controllers
                 if (isExist == null)
                 {
                     await _monitoringService.StartMonitoring(userId);
-                    _ = Task.Run(async () => await GenerateSensorDataLoop()); // Запускаємо фонову задачу
+                    _ = Task.Run(async () => await GenerateSensorDataLoop());
                 }
             }
             else

@@ -35,6 +35,18 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var appLifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+appLifetime.ApplicationStopping.Register(async () =>
+{
+    using var scope = app.Services.CreateScope();
+    var monitoringService = scope.ServiceProvider.GetRequiredService<IMonitoringService>();
+    var currentUserService = scope.ServiceProvider.GetRequiredService<ICurrentUserService>();
+
+    int userId = Convert.ToInt32(currentUserService.GetUserId());
+    await monitoringService.StopMonitoring(userId);
+});
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

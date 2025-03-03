@@ -9,5 +9,6 @@ namespace SensorProcessingDemo.Services.Interfaces
         Task StopMonitoring(int userId);
         bool ExistWithUserId(int userId);
         Task<Monitoring?> CurrentExistWithUserId(int userId);
+        Task<IEnumerable<Monitoring>> GetAllActiveMonitorings();
     }
 }

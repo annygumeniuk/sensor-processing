@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.Services.AddSingleton<IConfiguration>(configuration);
 
 builder.Services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddControllersWithViews();
@@ -26,6 +27,8 @@ var jwtOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOpt
 builder.Services.AddApiAuthAuthentification(configuration, jwtOptions);
 builder.Services.AddDbContextFactory<MonitoringSystemContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Configuration.AddUserSecrets<Program>();
 
 var app = builder.Build();
 

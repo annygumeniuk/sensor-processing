@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windy API Map</title>
+
+    <!-- Load the required Leaflet 1.4.0 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+
+    <!-- Load Windy API -->
+    <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+</head>
+<body>
+
+    <div id="windy" style="width: 100%; height: 500px;"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof windyInit === 'function') {
+                windyInit({
+                    key:  "@ViewData["WindyAPIKey"]",
+                    lat: 50.45,
+                    lon: 30.523,
+                    zoom: 5
+                }, function (windyAPI) {
+                    console.log("Windy API Loaded!");
+                    const { map } = windyAPI;
+                });
+            } else {
+                console.error("Windy API failed to load.");
+            }
+        });
+    </script>
+
+</body>
+</html>

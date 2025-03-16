@@ -1,30 +1,47 @@
-﻿<!DOCTYPE html>
+﻿@model SensorProcessingDemo.Models.Location;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
     <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
-    <title>Windy API Map</title>        
-    <style>                              
-        #windy {            
-            width: 100%;
-            height: 500px;
-        }
-    </style>
+    
+    <link rel="stylesheet" href="~/css/windymap.css" asp-append-version="true" />
+    
+    <title>Windy API Map</title>            
 </head>
 <body>
     
-    <!-- Windy Map Container -->
-    <div id="windy"></div>
+    <div class="text-center">
+        <h4>Enter latitude and longitude to find any place</h4>
 
+        <form asp-controller="WindsMap" asp-action="Index" method="post">            
+            <div class="input-container">
+                <input asp-for="Latitude" class="long-lat-input" placeholder="Latitude" name="latitude" />
+                <input asp-for="Longitude" class="long-lat-input" placeholder="Longitude" name="longitude" />
+            </div>
+            
+            <div class="error-messages">
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+
+            <button class="long-lat-btn-find" type="submit">Find</button>
+        </form>
+    </div>
+
+
+    <!-- Windy Map Container -->
+    <div id="windy"></div>    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             if (typeof windyInit === 'function') {
                 windyInit({
-                    key: "@ViewData["WindyAPIKey"]", // Ensure your Windy API key is correctly injected
-                    lat: 50.45,
-                    lon: 30.523,
+                    key: "@ViewData["WindyAPIKey"]",
+                    lat: "@ViewData["Latitude"]",
+                    lon: "@ViewData["Longitude"]",
                     zoom: 7
                 }, function (windyAPI) {
                     console.log("Windy API Loaded!");

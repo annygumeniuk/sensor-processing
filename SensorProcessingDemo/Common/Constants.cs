@@ -1,4 +1,6 @@
-﻿namespace SensorProcessingDemo.Common
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace SensorProcessingDemo.Common
 {
     public static class Constants
     {                
@@ -19,5 +21,28 @@
         // In lx
         public const decimal LIGHT_MIN  = 300m;
         public const decimal LIGHT_MAX  = 1000m;
+
+        // Latitude and longitude ranges
+        public const int LAT_MAX =  90;
+        public const int LAT_MIN = -90;
+
+        public const int LONG_MAX =  180;
+        public const int LONG_MIN = -180;
+
+        // Default error messages
+        public const string LAT_ErrorMessage = $"Latitude should be in range from -90 to 90";
+        public const string LONG_ErrorMessage = $"Longitude  should be in range from -180 to 180";
+
+        // Coordinates of Kyiv
+        public const double LAT_KYIV  = 50.4504;
+        public const double LONG_KYIV = 30.5245;
+
+        // Dictionary of default coordinates
+        public static Dictionary<string, List<double>> defaultPlaces = new Dictionary<string, List<double>>()
+        {
+            {"Kyiv",  new List<double>() { 50.45, 30.52}},
+            {"Odesa", new List<double>() { 46.47, 30.73 }},
+            {"Lviv",  new List<double>() { 49.83, 24.02 }}
+        };
     }
 }

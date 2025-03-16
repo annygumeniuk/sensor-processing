@@ -13,24 +13,22 @@ namespace SensorProcessingDemo.Controllers
             _configuration = configuration;
         }
 
-        public IActionResult Index(Location? model)
+        public IActionResult Index(Location model)
         {
             var apiKey = _configuration["WindyAPI:Key"];
             ViewData["WindyAPIKey"] = apiKey;
 
             if (ModelState.IsValid)
             {
-                if (model.Latitude == null || model.Longitude == null)
-                {
-                    ViewData["Longitude"] = Common.Constants.LONG_KYIV;
-                    ViewData["Latitude"] = Common.Constants.LAT_KYIV;
-                }
-                else
-                {
-                    ViewData["Longitude"] = model.Longitude;
-                    ViewData["Latitude"] = model.Latitude;
-                }                
-            }            
+                ViewData["Longitude"] = model.Longitude;
+                ViewData["Latitude"] = model.Latitude;
+            }
+            
+            if (model.Latitude == null|| model.Longitude == null)
+            {
+                ViewData["Longitude"] = Common.Constants.LONG_KYIV;
+                ViewData["Latitude"] = Common.Constants.LAT_KYIV;
+            }
             return View();
         }
     }

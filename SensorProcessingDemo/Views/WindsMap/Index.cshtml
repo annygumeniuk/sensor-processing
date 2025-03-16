@@ -1,32 +1,43 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windy API Map</title>
-
-    <!-- Load the required Leaflet 1.4.0 -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-
-    <!-- Load Windy API -->
     <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+    <title>Windy API Map</title>        
+    <style>                              
+        #windy {            
+            width: 100%;
+            height: 500px;
+        }
+    </style>
 </head>
 <body>
-
-    <div id="windy" style="width: 100%; height: 500px;"></div>
+    
+    <!-- Windy Map Container -->
+    <div id="windy"></div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             if (typeof windyInit === 'function') {
                 windyInit({
-                    key:  "@ViewData["WindyAPIKey"]",
+                    key: "@ViewData["WindyAPIKey"]", // Ensure your Windy API key is correctly injected
                     lat: 50.45,
                     lon: 30.523,
-                    zoom: 5
+                    zoom: 7
                 }, function (windyAPI) {
                     console.log("Windy API Loaded!");
-                    const { map } = windyAPI;
+
+                    const { map, store, picker, utils } = windyAPI;
+
+                    // Enable Windy controls
+                    store.set('overlay', 'wind'); // Default overlay
+                    store.set('showMenu', true); // Display the menu
+                    store.set('showToolbar', true); // Show the toolbar
+                    store.set('showTimeslider', true); // Show timeslider
+                    store.set('showForecast', true); // Show forecast panel
+                    store.set('showWindbarb', true); // Wind barbs on the map                  
                 });
             } else {
                 console.error("Windy API failed to load.");

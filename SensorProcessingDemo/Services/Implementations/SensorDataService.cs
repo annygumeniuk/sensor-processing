@@ -63,24 +63,30 @@ namespace SensorProcessingDemo.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Sensor>> GetAll(int userId, SensorFilter filter)
+        public async Task<IEnumerable<Sensor>> GetAll(int userId, SensorFilter filter)
         {
             _logger.LogInformation("Trying to get sensors data for current user from db.");
 
-            var predicate = PredicateBuilder.True<Sensor>();
-            predicate = predicate.And(s => s.UserId == userId);
+            var predicate = PredicateBuilder.True<Sensor>().And(s => s.UserId == userId);
+            var selectedTypes = new List<string>();
 
-            if (!string.IsNullOrEmpty(filter.SensorName))
+            if (filter.DisplayTemp) selectedTypes.Add("Temperature");
+            if (filter.DisplayHum) selectedTypes.Add("Humidity");
+            if (filter.DisplayLight) selectedTypes.Add("Lighting");
+
+            if (selectedTypes.Any())
             {
-                predicate = predicate.And(s => s.Name.Contains(filter.SensorName));
+                _logger.LogInformation($"Filtering by sensor types: {string.Join(", ", selectedTypes)}");
+                predicate = predicate.And(s => selectedTypes.Contains(s.Name));
             }
-            
-            var sensors = _sensorContext.FindAsync(predicate);
+            else
+            {
+                _logger.LogInformation("No filters applied, returning all sensor data.");
+            }
 
-            _logger.LogInformation("Sensor data was fetched.");
-
-            return sensors;                        
+            return await _sensorContext.FindAsync(predicate);
         }
+
 
         public Task GetSensorDataByDate(DateTime dateTime)
         {

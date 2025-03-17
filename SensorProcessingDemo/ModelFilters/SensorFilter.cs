@@ -1,7 +1,12 @@
-﻿namespace SensorProcessingDemo.ModelFilters
+﻿using SensorProcessingDemo.Models;
+namespace SensorProcessingDemo.ModelFilters
 {
     public class SensorFilter
     {
-        public string SensorName { get; set; } = string.Empty;
+        public bool DisplayTemp  { get; set; } = false;
+        public bool DisplayHum   { get; set; } = false;
+        public bool DisplayLight { get; set; } = false;
+
+        public List<Sensor> Sensors { get; set; } = new();
     }
 }

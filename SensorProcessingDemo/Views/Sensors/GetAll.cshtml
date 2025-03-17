@@ -1,0 +1,49 @@
+﻿@model SensorProcessingDemo.ModelFilters.SensorFilter
+@{
+    ViewData["Title"] = "Sensor Data";
+    var sensors = ViewBag.Sensors as IEnumerable<Sensor>; // ✅ Get sensors from ViewBag
+}
+
+<h2>Sensor Data</h2>
+
+<form asp-controller="Sensors" asp-action="GetAll" method="get">
+    <div class="btn-group" role="group">
+        <input type="checkbox" class="btn-check" id="temp" asp-for="DisplayTemp">
+        <label class="btn btn-outline-primary" for="temp">Temperature</label>
+
+        <input type="checkbox" class="btn-check" id="hum" asp-for="DisplayHum">
+        <label class="btn btn-outline-primary" for="hum">Humidity</label>
+
+        <input type="checkbox" class="btn-check" id="light" asp-for="DisplayLight">
+        <label class="btn btn-outline-primary" for="light">Lighting</label>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Apply Filters</button>
+</form>
+
+@if (sensors != null && sensors.Any()) // ✅ Check if sensors exist
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sensor in sensors)
+            {
+                <tr>
+                    <td>@sensor.Name</td>
+                    <td>@sensor.Value</td>
+                    <td>@sensor.dateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No sensor data available.</p>
+}

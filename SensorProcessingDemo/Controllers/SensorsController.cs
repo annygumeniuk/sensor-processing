@@ -146,12 +146,14 @@ namespace SensorProcessingDemo.Controllers
             }
         }
 
-        public async Task<IActionResult> AllSensorsRecords(SensorFilter filter)
+        public async Task<IActionResult> GetAll(SensorFilter filter)
         {
             int userId = Convert.ToInt32(_currentUserService.GetUserId());
             var sensors = await _sensorDataService.GetAll(userId, filter);
 
-            return View(sensors);
+            ViewBag.Sensors = sensors;
+
+            return View(filter);
         }
     }
 }

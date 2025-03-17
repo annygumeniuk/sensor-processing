@@ -1,6 +1,9 @@
 ﻿using SensorProcessingDemo.Models;
+using SensorProcessingDemo.ModelFilters;
 using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services.Interfaces;
+using SensorProcessingDemo.Common;
+using System.Linq.Expressions;
 
 namespace SensorProcessingDemo.Services.Implementations
 {
@@ -60,9 +63,23 @@ namespace SensorProcessingDemo.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Sensor>> GetAll()
+        public Task<IEnumerable<Sensor>> GetAll(int userId, SensorFilter filter)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Trying to get sensors data for current user from db.");
+
+            var predicate = PredicateBuilder.True<Sensor>();
+            predicate = predicate.And(s => s.UserId == userId);
+
+            if (!string.IsNullOrEmpty(filter.SensorName))
+            {
+                predicate = predicate.And(s => s.Name.Contains(filter.SensorName));
+            }
+            
+            var sensors = _sensorContext.FindAsync(predicate);
+
+            _logger.LogInformation("Sensor data was fetched.");
+
+            return sensors;                        
         }
 
         public Task GetSensorDataByDate(DateTime dateTime)

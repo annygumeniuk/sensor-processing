@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Sensor>
+
+@{
+    ViewData["Title"] = "Sensor Data";
+}
+
+<h2>Sensor Data</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sensor in Model)
+        {
+            <tr>
+                <td>@sensor.Name</td>
+                <td>@sensor.Value</td>
+                <td>@sensor.dateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            </tr>
+        }
+    </tbody>
+</table>

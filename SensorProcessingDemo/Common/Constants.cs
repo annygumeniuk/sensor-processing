@@ -3,10 +3,7 @@
 namespace SensorProcessingDemo.Common
 {
     public static class Constants
-    {                
-        // Enum to store sensors names
-        public enum SENSORNAME { Temperature, Humidity, Lighting };
-
+    {                        
         // Interval to update plots
         public const int UpdateIntervalSeconds = 2;
 

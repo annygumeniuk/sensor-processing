@@ -7,7 +7,7 @@
 
 <button class="btn btn-primary" id="toggleMonitoringBtn" onclick="toggleMonitoring()">Start Monitoring</button>
 <div id="sensorData">
-    <p>Loading sensor data...</p>
+    <a asp-controller="Sensors" asp-action="AllSensorsRecords">All records</a>
 </div>
 
 <div id="charts-container" style="display: flex; flex-direction: column; gap: 20px;">

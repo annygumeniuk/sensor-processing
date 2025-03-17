@@ -15,13 +15,13 @@ namespace SensorProcessingDemo.Models
         public int UserId { get; set; }
         public string  Name  { get; set; }
                 
-        public float Value { get; set; }        
+        public decimal Value { get; set; }        
         public DateTime dateTime { get; set; }
         
         public virtual AlertCollector? AlertCollector { get; set; }
         public virtual User? User { get; set; }
 
-        public Sensor(int userId, string name, float value)
+        public Sensor(int userId, string name, decimal value)
         {             
             UserId = userId;
             Name = name;

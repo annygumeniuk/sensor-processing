@@ -5,6 +5,7 @@ using SensorProcessingDemo.Repositories.Interfaces;
 using System.Collections.Concurrent;
 using SensorProcessingDemo.Models;
 using SensorProcessingDemo.Services.Interfaces;
+using SensorProcessingDemo.ModelFilters;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -102,7 +103,7 @@ namespace SensorProcessingDemo.Controllers
                     try 
                     {
                         SensorData[sensor].Add((DateTime.Now, value));
-                        Sensor sens = new Sensor(currentUserId, sensor, (float)value);
+                        Sensor sens = new Sensor(currentUserId, sensor, value);
 
                         await _sensorDataService.Create(sens);
                     }
@@ -143,6 +144,14 @@ namespace SensorProcessingDemo.Controllers
             {
                 // TODO: Add record to alert collector
             }
-        }       
+        }
+
+        public async Task<IActionResult> AllSensorsRecords(SensorFilter filter)
+        {
+            int userId = Convert.ToInt32(_currentUserService.GetUserId());
+            var sensors = await _sensorDataService.GetAll(userId, filter);
+
+            return View(sensors);
+        }
     }
 }

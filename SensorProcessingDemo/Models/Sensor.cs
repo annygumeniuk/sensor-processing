@@ -21,14 +21,12 @@ namespace SensorProcessingDemo.Models
         public virtual AlertCollector? AlertCollector { get; set; }
         public virtual User? User { get; set; }
 
-        public Sensor(int id, string name, float value, DateTime time)
-        { 
-            Id = id;
+        public Sensor(int userId, string name, float value)
+        {             
+            UserId = userId;
             Name = name;
             Value = value;
-            dateTime = time;
-        }
-
-        public Sensor() { }   
+            dateTime = DateTime.Now;
+        }        
     }
 }

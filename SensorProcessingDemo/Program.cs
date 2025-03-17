@@ -21,6 +21,7 @@ builder.Services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IMonitoringService, MonitoringService>();
+builder.Services.AddScoped<ISensorDataService, SensorDataService>();
 
 var jwtOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>();
 

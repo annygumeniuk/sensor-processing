@@ -16,9 +16,8 @@ namespace SensorProcessingDemo.Controllers
         
         private static readonly Random Random = new();
         private static bool isRunning = false;
-        
-        private readonly IEntityRepository<Monitoring> _monitoringContext;
-        private readonly IEntityRepository<Sensor> _sensorContext;       
+                
+        private readonly ISensorDataService _sensorDataService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IMonitoringService _monitoringService;
 
@@ -31,13 +30,11 @@ namespace SensorProcessingDemo.Controllers
             };
 
         public SensorsController(
-            IEntityRepository<Monitoring> monitoringContext,
-            IEntityRepository<Sensor> sensorContext,
+            ISensorDataService sensorDataService,
             ICurrentUserService currentUserService,
             IMonitoringService monitoringService)
-        {
-            _monitoringContext = monitoringContext;
-            _sensorContext = sensorContext;
+        {            
+            _sensorDataService = sensorDataService;
             _currentUserService = currentUserService;
             _monitoringService = monitoringService;
         }
@@ -53,7 +50,7 @@ namespace SensorProcessingDemo.Controllers
             {
                 SensorData.Clear(); // clear previous data
                 await _monitoringService.StartMonitoring(userId);
-                _ = Task.Run(async () => await GenerateSensorDataLoop());
+                _ = Task.Run(async () => await GenerateSensorDataLoop(userId));
             }
             else
             {
@@ -75,7 +72,7 @@ namespace SensorProcessingDemo.Controllers
                 if (isExist == null)
                 {
                     await _monitoringService.StartMonitoring(userId);
-                    _ = Task.Run(async () => await GenerateSensorDataLoop());
+                    _ = Task.Run(async () => await GenerateSensorDataLoop(userId));
                 }
             }
             else
@@ -87,7 +84,7 @@ namespace SensorProcessingDemo.Controllers
             }
         }
 
-        public async Task GenerateSensorDataLoop()
+        public async Task GenerateSensorDataLoop(int currentUserId)
         {
             while (isRunning)
             {
@@ -102,16 +99,26 @@ namespace SensorProcessingDemo.Controllers
                     if (SensorData[sensor].Count > 100)
                         SensorData[sensor].RemoveAt(0);
 
-                    SensorData[sensor].Add((DateTime.Now, value));
+                    try 
+                    {
+                        SensorData[sensor].Add((DateTime.Now, value));
+                        Sensor sens = new Sensor(currentUserId, sensor, (float)value);
+
+                        await _sensorDataService.Create(sens);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
                 }
 
                 await Task.Delay(Common.Constants.UpdateIntervalSeconds * 1000);
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            Run();
+            await Run();
             return View();
         }
 

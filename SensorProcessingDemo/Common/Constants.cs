@@ -37,7 +37,7 @@ namespace SensorProcessingDemo.Common
         public const double LAT_KYIV  = 50.4504;
         public const double LONG_KYIV = 30.5245;
 
-        // Dictionary of default coordinates
+        // [NOT USED FOR NOW] Dictionary of default coordinates
         public static Dictionary<string, List<double>> defaultPlaces = new Dictionary<string, List<double>>()
         {
             {"Kyiv",  new List<double>() { 50.45, 30.52}},

@@ -9,5 +9,6 @@ namespace SensorProcessingDemo.Services.Interfaces
         Task Create(Sensor sensor);
         Task Delete(int sensorId);
         Task DeleteAll();
+        Task<Sensor> GetSensorById(int sensorId);
     }
 }

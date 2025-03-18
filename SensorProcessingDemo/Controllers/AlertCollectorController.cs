@@ -18,8 +18,9 @@ namespace SensorProcessingDemo.Controllers
         {
             int userId = Convert.ToInt32(_currentUserService.GetUserId());
             var alerts = await _alertService.GetAll(userId);
-                        
+
             return View(alerts);
         }
+        
     }
 }

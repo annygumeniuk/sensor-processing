@@ -13,6 +13,6 @@ namespace SensorProcessingDemo.Models
         [ForeignKey(nameof(Sensor))]
         public int SensorId { get; set; }
 
-        public virtual Sensor Sensor { get; set; }
+        public virtual Sensor Sensor { get; set; }        
     }
 }

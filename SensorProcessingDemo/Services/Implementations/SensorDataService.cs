@@ -96,6 +96,13 @@ namespace SensorProcessingDemo.Services.Implementations
             return await _sensorContext.FindAsync(predicate);
         }
 
+        public Task<Sensor> GetSensorById(int sensorId)
+        {
+            _logger.LogInformation("Trying to get sensor data by id from db.");
+            var sensor = _sensorContext.GetByIdAsync(sensorId);
+
+            return sensor;
+        }
 
         public Task GetSensorDataByDate(DateTime dateTime)
         {

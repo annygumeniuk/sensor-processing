@@ -6,6 +6,8 @@ using System.Collections.Concurrent;
 using SensorProcessingDemo.Models;
 using SensorProcessingDemo.Services.Interfaces;
 using SensorProcessingDemo.ModelFilters;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -18,9 +20,10 @@ namespace SensorProcessingDemo.Controllers
         private static readonly Random Random = new();
         private static bool isRunning = false;
                 
-        private readonly ISensorDataService _sensorDataService;
+        private readonly ISensorDataService  _sensorDataService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IMonitoringService _monitoringService;
+        private readonly IMonitoringService  _monitoringService;
+        private readonly IAlertService       _alertService;
 
         private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
             new Dictionary<string, (decimal min, decimal max)>
@@ -33,11 +36,13 @@ namespace SensorProcessingDemo.Controllers
         public SensorsController(
             ISensorDataService sensorDataService,
             ICurrentUserService currentUserService,
-            IMonitoringService monitoringService)
-        {            
+            IMonitoringService monitoringService,
+            IAlertService alertService)
+        {
             _sensorDataService = sensorDataService;
             _currentUserService = currentUserService;
             _monitoringService = monitoringService;
+            _alertService = alertService;
         }
 
         [HttpPost("toggle-monitoring")]
@@ -88,7 +93,7 @@ namespace SensorProcessingDemo.Controllers
         public async Task GenerateSensorDataLoop(int currentUserId)
         {
             while (isRunning)
-            {
+            {                
                 foreach (var sensor in SensorRanges.Keys)
                 {
                     var range = SensorRanges[sensor];
@@ -99,20 +104,23 @@ namespace SensorProcessingDemo.Controllers
 
                     if (SensorData[sensor].Count > 100)
                         SensorData[sensor].RemoveAt(0);
+                    
+                    SensorData[sensor].Add((DateTime.Now, value));
+                    Sensor sens = new Sensor(currentUserId, sensor, value);
 
-                    try 
-                    {
-                        SensorData[sensor].Add((DateTime.Now, value));
-                        Sensor sens = new Sensor(currentUserId, sensor, value);
+                    await _sensorDataService.Create(sens);
 
-                        await _sensorDataService.Create(sens);
-                    }
-                    catch (Exception ex)
+                    if (value < range.min || value > range.max)
                     {
-                        Console.WriteLine(ex.ToString());
-                    }
+                        var alert = new AlertCollector
+                        {
+                            SensorId = sens.Id,
+                            Sensor = sens
+                        };
+
+                        await _alertService.Create(alert);
+                    }                                        
                 }
-
                 await Task.Delay(Common.Constants.UpdateIntervalSeconds * 1000);
             }
         }
@@ -131,21 +139,7 @@ namespace SensorProcessingDemo.Controllers
                 kvp => kvp.Value.Select(v => new { v.time, v.value }).ToList()));
         }
 
-        public bool CheckIfValueInRange(decimal value, decimal max, decimal min)
-        { 
-            return value <= max && value >= min;
-        }
-
-        public void AddAlertRecord(decimal value, decimal max, decimal min)
-        {
-            bool isInRange = CheckIfValueInRange(value, max, min);
-
-            if (!isInRange)
-            {
-                // TODO: Add record to alert collector
-            }
-        }
-
+        [HttpGet]
         public async Task<IActionResult> GetAll(SensorFilter filter)
         {
             int userId = Convert.ToInt32(_currentUserService.GetUserId());

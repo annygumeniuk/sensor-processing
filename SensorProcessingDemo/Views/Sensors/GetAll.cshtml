@@ -1,8 +1,10 @@
 ﻿@model SensorProcessingDemo.ModelFilters.SensorFilter
 @{
     ViewData["Title"] = "Sensor Data";
-    var sensors = ViewBag.Sensors as IEnumerable<Sensor>; // ✅ Get sensors from ViewBag
+    var sensors = ViewBag.Sensors as IEnumerable<Sensor>;
 }
+
+<link rel="stylesheet" href="~/css/windymap.css" asp-append-version="true" />
 
 <h2>Sensor Data</h2>
 
@@ -18,10 +20,18 @@
         <label class="btn btn-outline-primary" for="light">Lighting</label>
     </div>
 
+    <div class="mt-2">
+        <label for="DateFrom">Date From:</label>
+        <input type="datetime-local" class="form-control" id="DateFrom" asp-for="DateFrom">
+
+        <label for="DateTo">Date To:</label>
+        <input type="datetime-local" class="form-control" id="DateTo" asp-for="DateTo">
+    </div>
+
     <button type="submit" class="btn btn-success mt-2">Apply Filters</button>
 </form>
 
-@if (sensors != null && sensors.Any()) // ✅ Check if sensors exist
+@if (sensors != null && sensors.Any())
 {
     <table class="table table-striped mt-3">
         <thead>
@@ -29,6 +39,7 @@
                 <th>Name</th>
                 <th>Value</th>
                 <th>Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -38,6 +49,12 @@
                     <td>@sensor.Name</td>
                     <td>@sensor.Value</td>
                     <td>@sensor.dateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>
+                        <form asp-action="Delete" asp-controller="Sensors" method="post">
+                            <input type="hidden" name="sensorId" value="@sensor.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>

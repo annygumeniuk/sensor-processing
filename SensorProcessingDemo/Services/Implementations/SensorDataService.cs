@@ -9,22 +9,19 @@ namespace SensorProcessingDemo.Services.Implementations
 {
     public class SensorDataService : ISensorDataService
     {
-        private readonly ILogger<SensorDataService> _logger;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly ILogger<SensorDataService> _logger;        
         private readonly IEntityRepository<Sensor> _sensorContext;
 
-        public SensorDataService(ILogger<SensorDataService> logger, 
-                                 ICurrentUserService currentUser, 
+        public SensorDataService(ILogger<SensorDataService> logger,                              
                                  IEntityRepository<Sensor> sensorContext)
         {
-            _logger = logger;
-            _currentUserService = currentUser;
+            _logger = logger;           
             _sensorContext = sensorContext;
         }   
 
         public Task Create(Sensor sensor)
         {
-            _logger.LogInformation("Trying to add new sensor data in db.");                       
+            _logger.LogInformation("Trying to add new sensor data in db.");
 
             try
             {
@@ -82,6 +79,18 @@ namespace SensorProcessingDemo.Services.Implementations
             else
             {
                 _logger.LogInformation("No filters applied, returning all sensor data.");
+            }
+
+            if (filter.DateFrom != default)
+            {
+                _logger.LogInformation($"Filtering from date: {filter.DateFrom}");
+                predicate = predicate.And(s => s.dateTime >= filter.DateFrom);
+            }
+
+            if (filter.DateTo != default)
+            {
+                _logger.LogInformation($"Filtering to date: {filter.DateTo}");
+                predicate = predicate.And(s => s.dateTime <= filter.DateTo);
             }
 
             return await _sensorContext.FindAsync(predicate);

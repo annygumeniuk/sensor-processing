@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SensorProcessingDemo.Models.AlertCollector>
+
+<h2>Alerts</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sensorAlert in Model)
+            {
+                <tr>
+                    <td>@sensorAlert.Sensor.Name</td>
+                    <td>@sensorAlert.Sensor.Value</td>
+                    <td>@sensorAlert.Sensor.dateTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No alerts available.</p>
+}

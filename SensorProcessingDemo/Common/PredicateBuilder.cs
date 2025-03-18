@@ -13,17 +13,7 @@ public static class PredicateBuilder
     {
         return param => true;
     }
-
-    /// <summary>
-    /// Creates a predicate that evaluates to false.
-    /// </summary>
-    /// <typeparam name="T">Type of our entity for what we creating LINQ request.</typeparam>
-    /// <returns>False.</returns>
-    public static Expression<Func<T, bool>> False<T>()
-    {
-        return param => false;
-    }
-
+    
     /// <summary>
     /// Creates a predicate expression from the specified lambda expression.
     /// </summary>
@@ -45,31 +35,7 @@ public static class PredicateBuilder
     public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
     {
         return first.Compose(second, Expression.AndAlso);
-    }
-
-    /// <summary>
-    /// Combines the first predicate with the second using the logical "or".
-    /// </summary>
-    /// <typeparam name="T">Type of our entity for what we creating LINQ request.</typeparam>
-    /// <param name="first">First predicate.</param>
-    /// <param name="second">Second predicate.</param>
-    /// <returns>Derived predicate.</returns>
-    public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
-    {
-        return first.Compose(second, Expression.OrElse);
-    }
-
-    /// <summary>
-    /// Negates the predicate.
-    /// </summary>
-    /// <typeparam name="T">Type of our entity for what we creating LINQ request.</typeparam>
-    /// <param name="expression">Our expression for what we want to apply the operation.</param>
-    /// <returns>Derived predicate.</returns>
-    public static Expression<Func<T, bool>> Not<T>(this Expression<Func<T, bool>> expression)
-    {
-        var negated = Expression.Not(expression.Body);
-        return Expression.Lambda<Func<T, bool>>(negated, expression.Parameters);
-    }
+    }        
 
     /// <summary>
     /// Combines the first expression with the second using the specified merge function.

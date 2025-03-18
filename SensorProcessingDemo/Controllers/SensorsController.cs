@@ -155,5 +155,12 @@ namespace SensorProcessingDemo.Controllers
 
             return View(filter);
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> Delete(int sensorId)
+        {            
+            await _sensorDataService.Delete(sensorId);
+            return RedirectToAction("GetAll");
+        }
     }
 }

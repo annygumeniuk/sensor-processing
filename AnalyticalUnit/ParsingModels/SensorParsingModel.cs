@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AnalyticalUnit.ParsingModels
+{
+    public class SensorParsingModel
+    {
+        public string Name { get; set; }
+        public decimal Value { get; set; }
+        public DateTime DateTime { get; set; }
+    }
+}

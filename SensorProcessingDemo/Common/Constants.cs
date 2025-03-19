@@ -11,28 +11,28 @@ namespace SensorProcessingDemo.Common
         public const decimal TEMP_MIN   = -60.0m;
         public const decimal TEMP_MAX   =  50.0m;
         
-        public const decimal ACCURACY_TEMP = 1.0m; // in °C 
+        public const decimal ERROR_TEMP = 1.0m; // in °C 
 
         // Humidity In %
         public const decimal HUM_MIN    = 30.0m;
         public const decimal HUM_MAX    = 100.0m;
 
-        public const decimal ACCURACY_HUM_IF_POSITIVE_TEMP = 5.0m; // in %
-        public const decimal ACCURACY_HUM_IF_NEGATIVE_TEMP = 5.0m; // in %
+        public const decimal ERROR_HUM_IF_POSITIVE_TEMP = 5.0m; // in %
+        public const decimal ERROR_HUM_IF_NEGATIVE_TEMP = 5.0m; // in %
 
         // Visibility In m
-        // [Note] this if visible is in other ranges the accuracy should be changed.
+        // [Note] this if visible is in other ranges the error should be changed.
         // All ranges: [20, 150], [150, 250], [250, 2000]
         public const decimal VIS_MIN  = 20m;
         public const decimal VIS_MAX  = 150m;
 
-        public const decimal ACCURACY_VIS = 20.0m; // in %
+        public const decimal ERROR_VIS = 20.0m; // in %
 
         // Atmospheric Pressure in hectopascal hPa
         public const decimal ATM_PRESS_MIN = 600.0m;
         public const decimal ATM_PRESS_MAX = 1080.0m;
 
-        public const decimal ACCURACY_ATM_PRESS = 0.05m; // in hPa
+        public const decimal ERROR_ATM_PRESS = 0.05m; // in hPa
 
 
         // Latitude and longitude ranges

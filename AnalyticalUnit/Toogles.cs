@@ -13,5 +13,7 @@ namespace AnalyticalUnit
         public static bool PARCE_SENSOR_CSV = true;
 
         public static bool DISPLAY_PARCED_SENSOR_DATA = false;
+
+        public static bool FORCASTING_TEMP = true;
     }
 }

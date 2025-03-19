@@ -1,1 +1,19 @@
-﻿
+﻿@model SensorProcessingDemo.Models.User
+
+@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<h2>Admin Panel</h2>
+
+<div>
+    <h3>Welcome, @Model.FirstName @Model.LastName</h3>
+
+    <ul>
+        <li><strong>Email:</strong> @Model.Email</li>
+        <li><strong>Role:</strong> @Model.Role</li>
+    </ul>
+
+    <a asp-action="AllUsers" asp-controller="Admin">All Users</a>
+</div>
+

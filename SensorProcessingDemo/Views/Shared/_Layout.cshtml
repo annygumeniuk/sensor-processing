@@ -22,7 +22,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>                       
-                        
+
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
@@ -30,14 +30,21 @@
                             </li>
 
                             <ul class="navbar-nav">                              
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="WindsMap" asp-action="Index">Map of Winds</a>                              
+                                <a class="nav-link text-dark" asp-area="" asp-controller="WindsMap" asp-action="Index">Map of Winds</a>                              
                             </ul>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <ul class="navbar-nav">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
+                                </ul>
+                            }
 
                             <ul class="navbar-nav flex-grow-2 ms-auto">
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
                                 </li>                           
-                            </ul>
+                            </ul>                            
                         }
                         else
                         {

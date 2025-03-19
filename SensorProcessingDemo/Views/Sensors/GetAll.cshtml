@@ -47,7 +47,21 @@
             {
                 <tr>
                     <td>@sensor.Name</td>
-                    <td>@sensor.Value</td>
+                    <td>
+                        @sensor.Value
+                        @if (sensor.Name == SensorProcessingDemo.Common.Enums.SENSORNAME.Humidity.ToString())
+                        {
+                            <span>%</span>
+                        }
+                        else if (sensor.Name == SensorProcessingDemo.Common.Enums.SENSORNAME.Temperature.ToString())
+                        {
+                            <span>°C</span>
+                        }
+                        else
+                        {
+                            <span>m</span>
+                        }
+                        </td>
                     <td>@sensor.dateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
                     <td>
                         <form asp-action="Delete" asp-controller="Sensors" method="post">

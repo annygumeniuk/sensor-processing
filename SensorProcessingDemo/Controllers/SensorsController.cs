@@ -8,6 +8,7 @@ using SensorProcessingDemo.Services.Interfaces;
 using SensorProcessingDemo.ModelFilters;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using static SensorProcessingDemo.Common.Enums;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -28,9 +29,9 @@ namespace SensorProcessingDemo.Controllers
         private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
             new Dictionary<string, (decimal min, decimal max)>
             {
-                { "Temperature", (Constants.TEMP_MIN, Constants.TEMP_MAX) },
-                { "Humidity", (Constants.HUM_MIN, Constants.HUM_MAX) },
-                { "Lighting", (Constants.LIGHT_MIN, Constants.LIGHT_MAX) }
+                { Enums.SENSORNAME.Temperature.ToString(), (Constants.TEMP_MIN, Constants.TEMP_MAX) },
+                { Enums.SENSORNAME.Humidity.ToString(),    (Constants.HUM_MIN, Constants.HUM_MAX) },
+                { Enums.SENSORNAME.Visibility.ToString(),  (Constants.VIS_MIN, Constants.VIS_MAX) }
             };
 
         public SensorsController(

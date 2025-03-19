@@ -9,11 +9,12 @@
             Descending,
         }
 
-        // [NOT USED FOR NOW] To store sensors names
+        // To store sensors names
         public enum SENSORNAME 
         { 
             Temperature, 
-            Humidity, 
-            Lighting };
+            Humidity,
+            Visibility
+        };
     }
 }

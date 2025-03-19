@@ -14,7 +14,7 @@
 <div id="charts-container" style="display: flex; flex-direction: column; gap: 20px;">
     <div id="temperatureChart" style="height: 300px; width: 100%;"></div>
     <div id="humidityChart" style="height: 300px; width: 100%;"></div>
-    <div id="lightingChart" style="height: 300px; width: 100%;"></div>
+    <div id="visibilityChart" style="height: 300px; width: 100%;"></div>
 </div>
 
 <script>
@@ -46,8 +46,8 @@
             axisY: { title: "Value", includeZero: false },
             data: [{ type: "line", dataPoints: [] }]
         }),
-        Lighting: new CanvasJS.Chart("lightingChart", {
-            title: { text: "Lighting (lx)" },
+        Visibility: new CanvasJS.Chart("visibilityChart", {
+            title: { text: "Visibility (m)" },
             axisY: { title: "Value", includeZero: false },
             data: [{ type: "line", dataPoints: [] }]
         })

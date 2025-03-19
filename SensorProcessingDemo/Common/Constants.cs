@@ -8,16 +8,25 @@ namespace SensorProcessingDemo.Common
         public const int UpdateIntervalSeconds = 2;
 
         // In °C 
-        public const decimal TEMP_MIN   = 18.0m;
-        public const decimal TEMP_MAX   = 22.5m; 
+        public const decimal TEMP_MIN   = -60.0m;
+        public const decimal TEMP_MAX   =  50.0m;
+        
+        public const decimal ACCURACY_TEMP = 1.0m; // in °C 
 
         // In %
         public const decimal HUM_MIN    = 30.0m;
-        public const decimal HUM_MAX    = 60.0m;
+        public const decimal HUM_MAX    = 100.0m;
 
-        // In lx
-        public const decimal LIGHT_MIN  = 300m;
-        public const decimal LIGHT_MAX  = 1000m;
+        public const decimal ACCURACY_HUM_IF_POSITIVE_TEMP = 5.0m; // in %
+        public const decimal ACCURACY_HUM_IF_NEGATIVE_TEMP = 5.0m; // in %
+
+        // In m
+        // [Note] this if visible is in other ranges the accuracy should be changed.
+        // All ranges: [20, 150], [150, 250], [250, 2000]
+        public const decimal VIS_MIN  = 20m;
+        public const decimal VIS_MAX  = 150m;
+
+        public const decimal ACCURACY_VIS = 20.0m; // in %
 
         // Latitude and longitude ranges
         public const int LAT_MAX =  90;

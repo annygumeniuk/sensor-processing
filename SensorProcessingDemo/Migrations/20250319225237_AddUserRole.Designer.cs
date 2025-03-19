@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SensorProcessingDemo.Services;
 
@@ -11,9 +12,11 @@ using SensorProcessingDemo.Services;
 namespace SensorProcessingDemo.Migrations
 {
     [DbContext(typeof(MonitoringSystemContext))]
-    partial class MonitoringSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20250319225237_AddUserRole")]
+    partial class AddUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

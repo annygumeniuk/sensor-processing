@@ -21,7 +21,8 @@ namespace SensorProcessingDemo.Auth
             Claim[] claims =
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Email, user.Email)
+                new(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var signingCredentials = new SigningCredentials(

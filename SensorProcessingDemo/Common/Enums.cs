@@ -17,5 +17,12 @@
             Visibility,
             AtmosphericPressure
         };
+
+        // [Not used for now] To store user roles
+        public enum ROLES
+        { 
+            User,
+            Admin
+        };
     }
 }

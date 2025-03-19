@@ -22,5 +22,8 @@ namespace SensorProcessingDemo.Models
         [StringLength(100, MinimumLength = 6, ErrorMessage = "The minimun leght is 6")]
         [Required(ErrorMessage = "This field is required")]
         public string Password { get; set; }
+
+        [Required]
+        public string Role { get; set; } = "User";
     }
 }

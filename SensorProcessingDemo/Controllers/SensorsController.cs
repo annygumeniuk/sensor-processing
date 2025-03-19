@@ -29,9 +29,10 @@ namespace SensorProcessingDemo.Controllers
         private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
             new Dictionary<string, (decimal min, decimal max)>
             {
-                { Enums.SENSORNAME.Temperature.ToString(), (Constants.TEMP_MIN, Constants.TEMP_MAX) },
-                { Enums.SENSORNAME.Humidity.ToString(),    (Constants.HUM_MIN, Constants.HUM_MAX) },
-                { Enums.SENSORNAME.Visibility.ToString(),  (Constants.VIS_MIN, Constants.VIS_MAX) }
+                { Enums.SENSORNAME.Temperature.ToString(),         (Constants.TEMP_MIN,      Constants.TEMP_MAX) },
+                { Enums.SENSORNAME.Humidity.ToString(),            (Constants.HUM_MIN,       Constants.HUM_MAX) },
+                { Enums.SENSORNAME.Visibility.ToString(),          (Constants.VIS_MIN,       Constants.VIS_MAX) },
+                { Enums.SENSORNAME.AtmosphericPressure.ToString(), (Constants.ATM_PRESS_MIN, Constants.ATM_PRESS_MAX) }
             };
 
         public SensorsController(

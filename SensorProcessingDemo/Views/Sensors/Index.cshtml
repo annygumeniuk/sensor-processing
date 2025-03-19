@@ -15,6 +15,7 @@
     <div id="temperatureChart" style="height: 300px; width: 100%;"></div>
     <div id="humidityChart" style="height: 300px; width: 100%;"></div>
     <div id="visibilityChart" style="height: 300px; width: 100%;"></div>
+    <div id="atmPressChart" style="height: 300px; width: 100%;"></div>
 </div>
 
 <script>
@@ -50,9 +51,14 @@
             title: { text: "Visibility (m)" },
             axisY: { title: "Value", includeZero: false },
             data: [{ type: "line", dataPoints: [] }]
+        }),
+         AtmosphericPressure: new CanvasJS.Chart("atmPressChart", {
+            title: { text: "Atmospheric Pressure (hPa)" },
+            axisY: { title: "Value", includeZero: false },
+            data: [{ type: "line", dataPoints: [] }]
         })
     };
-
+    
     function fetchSensorData() {
         fetch('/get-sensor-data')
             .then(response => response.json())

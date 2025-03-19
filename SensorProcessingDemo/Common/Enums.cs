@@ -14,7 +14,8 @@
         { 
             Temperature, 
             Humidity,
-            Visibility
+            Visibility,
+            AtmosphericPressure
         };
     }
 }

@@ -4,9 +4,10 @@ namespace SensorProcessingDemo.ModelFilters
 {
     public class SensorFilter
     {
-        public bool DisplayTemp  { get; set; } = false;
-        public bool DisplayHum   { get; set; } = false;
-        public bool DisplayLight { get; set; } = false;
+        public bool DisplayTemp     { get; set; } = false;
+        public bool DisplayHum      { get; set; } = false;
+        public bool DisplayVis { get; set; } = false;
+        public bool DisplayAtmPress { get; set; } = false;
 
         [DateTimeFormat("yyyy-MM-dd HH:mm:ss")]
         public DateTime DateFrom { get; set; }

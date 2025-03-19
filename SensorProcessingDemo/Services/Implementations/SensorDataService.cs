@@ -4,6 +4,7 @@ using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services.Interfaces;
 using SensorProcessingDemo.Common;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 
 namespace SensorProcessingDemo.Services.Implementations
 {
@@ -67,9 +68,13 @@ namespace SensorProcessingDemo.Services.Implementations
             var predicate = PredicateBuilder.True<Sensor>().And(s => s.UserId == userId);
             var selectedTypes = new List<string>();
 
-            if (filter.DisplayTemp) selectedTypes.Add("Temperature");
-            if (filter.DisplayHum) selectedTypes.Add("Humidity");
-            if (filter.DisplayLight) selectedTypes.Add("Lighting");
+            if (filter.DisplayTemp) selectedTypes.Add(Enums.SENSORNAME.Temperature.ToString());
+            if (filter.DisplayHum) selectedTypes.Add(Enums.SENSORNAME.Humidity.ToString());
+            if (filter.DisplayVis) selectedTypes.Add(Enums.SENSORNAME.Visibility.ToString());
+            if (filter.DisplayAtmPress) selectedTypes.Add(Enums.SENSORNAME.AtmosphericPressure.ToString());
+            {
+                
+            }
 
             if (selectedTypes.Any())
             {

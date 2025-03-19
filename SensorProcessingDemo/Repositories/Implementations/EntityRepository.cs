@@ -68,5 +68,11 @@ namespace SensorProcessingDemo.Repositories.Implementations
             await using var context = _contextFactory.CreateDbContext();
             await context.SaveChangesAsync();
         }
+
+        public async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<T, TResult>> selector)
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.Set<T>().Select(selector).ToListAsync();
+        }
     }
 }

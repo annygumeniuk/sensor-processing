@@ -5,6 +5,10 @@ using SensorProcessingDemo.Services.Interfaces;
 using SensorProcessingDemo.Common;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
+using CsvHelper;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Text;
 
 namespace SensorProcessingDemo.Services.Implementations
 {
@@ -112,6 +116,22 @@ namespace SensorProcessingDemo.Services.Implementations
         public Task GetSensorDataByDate(DateTime dateTime)
         {
             throw new NotImplementedException();
+        }
+        
+        public async Task<byte[]> ExportSensorDataAsync()
+        {
+            _logger.LogInformation("Trying to get sensor data for export.");
+            var sensors = await _sensorContext.SelectAsync(s => new { s.Name, s.Value, s.dateTime });
+            using var memoryStream = new MemoryStream();
+            using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
+            using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
+
+            await csvWriter.WriteRecordsAsync(sensors);
+            await streamWriter.FlushAsync();
+            
+            _logger.LogInformation("Passing data for export.");
+            
+            return memoryStream.ToArray();
         }
     }
 }

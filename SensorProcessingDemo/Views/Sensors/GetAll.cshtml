@@ -31,9 +31,12 @@
         <input type="datetime-local" class="form-control" id="DateTo" asp-for="DateTo">
     </div>
 
-    <button type="submit" class="btn btn-success mt-2">Apply Filters</button>
+    <button type="submit" class="btn btn-success mt-2" style="width:150px">Apply Filters</button>
 </form>
 
+<form method="get" asp-action="ExportSensors" asp-controller="Sensors">
+    <button type="submit" class="btn btn-success mt-2" style="width:150px">Download CSV</button>
+</form>
 @if (sensors != null && sensors.Any())
 {
     <table class="table table-striped mt-3">
@@ -60,9 +63,13 @@
                         {
                             <span>°C</span>
                         }
-                        else
+                        else if (sensor.Name == SensorProcessingDemo.Common.Enums.SENSORNAME.Visibility.ToString())
                         {
                             <span>m</span>
+                        }
+                        else if (sensor.Name == SensorProcessingDemo.Common.Enums.SENSORNAME.AtmosphericPressure.ToString())
+                        {
+                            <span>hPa</span>
                         }
                         </td>
                     <td>@sensor.dateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>

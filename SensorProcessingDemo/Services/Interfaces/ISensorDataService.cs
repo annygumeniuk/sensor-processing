@@ -10,5 +10,6 @@ namespace SensorProcessingDemo.Services.Interfaces
         Task Delete(int sensorId);
         Task DeleteAll();
         Task<Sensor> GetSensorById(int sensorId);
+        Task<byte[]> ExportSensorDataAsync();
     }
 }

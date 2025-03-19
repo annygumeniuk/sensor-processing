@@ -12,5 +12,6 @@ namespace SensorProcessingDemo.Repositories.Interfaces
         Task UpdateAsync(T entity);
         Task DeleteAsync(object id);
         Task SaveChangesAsync();
+        Task<List<TResult>> SelectAsync<TResult>(Expression<Func<T, TResult>> selector);
     }
 }

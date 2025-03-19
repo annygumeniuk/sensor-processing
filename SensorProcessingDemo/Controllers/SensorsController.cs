@@ -9,6 +9,10 @@ using SensorProcessingDemo.ModelFilters;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using static SensorProcessingDemo.Common.Enums;
+using CsvHelper;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Text;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -157,6 +161,13 @@ namespace SensorProcessingDemo.Controllers
         {            
             await _sensorDataService.Delete(sensorId);
             return RedirectToAction("GetAll");
+        }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportSensors()
+        {
+            var fileBytes = await _sensorDataService.ExportSensorDataAsync();
+            return File(fileBytes, "text/csv", "sensors_data.csv");
         }
     }
 }

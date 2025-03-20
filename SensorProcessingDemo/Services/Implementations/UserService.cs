@@ -29,10 +29,41 @@ namespace SensorProcessingDemo.Services.Implementations
 
         public async Task<User> GetUser(int userId)
         {
-            _logger.LogInformation("Trying to get currecnt user from db.");
+            _logger.LogInformation("Trying to get current user from db.");
             var user = await _userContext.GetByIdAsync(userId);
 
             return user;
         }
+
+        public async Task ChangeUserRole(int userId)
+        {
+            _logger.LogInformation("Trying to get current user from db to change the role.");
+
+            var user = await _userContext.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+
+            }
+            if (user.Role == "Admin")
+            {
+                user.Role = "User";
+                await _userContext.UpdateAsync(user);
+                
+                _logger.LogInformation("The role was changed Admin -> User.");
+                return;
+            }
+
+            if (user.Role == "User")
+            {
+                user.Role = "Admin";
+                await _userContext.UpdateAsync(user);
+                _logger.LogInformation("The role was changed User -> Admin.");
+                return;
+            }
+
+            await _userContext.UpdateAsync(user);
+        }        
     }
 }

@@ -30,7 +30,13 @@
                     <td>@user.LastName</td>
                     <td>@user.Email</td>
                     <td>@user.Role</td>
-                    <td><button asp-action="#" asp-controller="#" class="btn btn-danger">Change Role</button></td>
+                    <td>
+                        <form asp-action="ChangeUserRole" asp-controller="Admin" method="post">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn btn-danger">Change Role</button>
+                        </form>
+                    </td>
+
                 </tr>
                 index++;
             }

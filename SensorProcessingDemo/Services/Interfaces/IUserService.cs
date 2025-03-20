@@ -6,5 +6,6 @@ namespace SensorProcessingDemo.Services.Interfaces
     {
         Task<IEnumerable<User>> GetAll(int userId);
         Task<User> GetUser(int userId);
+        Task ChangeUserRole(int userId);
     }
 }

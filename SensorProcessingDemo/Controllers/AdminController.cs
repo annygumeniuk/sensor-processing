@@ -11,7 +11,7 @@ namespace SensorProcessingDemo.Controllers
         private readonly IUserService _userService;
 
         public AdminController(ICurrentUserService currentUserService, IUserService userService)
-        { 
+        {
             _currentUserService = currentUserService;
             _userService = userService;
         }
@@ -21,7 +21,7 @@ namespace SensorProcessingDemo.Controllers
         {
             int userId = Convert.ToInt32(_currentUserService.GetUserId());
             var adminInfo = await _userService.GetUser(userId);
-            
+
             return View(adminInfo);
         }
 
@@ -32,6 +32,13 @@ namespace SensorProcessingDemo.Controllers
             var allUsers = await _userService.GetAll(userId);
 
             return View(allUsers);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ChangeUserRole(int userId)
+        {
+            await _userService.ChangeUserRole(userId);
+            return RedirectToAction("AllUsers");                        
         }
     }
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensorProcessingTests", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalyticalUnit", "..\AnalyticalUnit\AnalyticalUnit.csproj", "{F3175CB2-9FC1-4CBC-B2D3-EF4377918B5F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataGeneratorLibrary", "..\DataGeneratorLibrary\DataGeneratorLibrary.csproj", "{006DB789-810A-4679-AFA0-7002144E894E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F3175CB2-9FC1-4CBC-B2D3-EF4377918B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3175CB2-9FC1-4CBC-B2D3-EF4377918B5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3175CB2-9FC1-4CBC-B2D3-EF4377918B5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{006DB789-810A-4679-AFA0-7002144E894E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{006DB789-810A-4679-AFA0-7002144E894E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{006DB789-810A-4679-AFA0-7002144E894E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{006DB789-810A-4679-AFA0-7002144E894E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

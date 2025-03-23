@@ -1,47 +1,59 @@
 ﻿using System;
 using Microsoft.ML;
 using Microsoft.ML.Data;
+using DataGeneratorLibrary.PredictionModels;
 
 namespace DataGeneratorLibrary
-{
+{    
     public class WeatherModel
-    {        
-        private readonly MLContext mlContext;
-        private readonly ITransformer model;
-        private readonly PredictionEngine<WeatherData, WeatherPredictionTemp> predictor;
-
-        public WeatherModel()
+    {
+        public void Generate()
         {
-            mlContext = new MLContext();
-            var data = mlContext.Data.LoadFromTextFile<WeatherData>(_trainingFilePath, separatorChar: ',', hasHeader: true);
-            
-            var pipeline = mlContext.Transforms.Concatenate("Features", new[] { "Humidity", "Pressure", "Visibility" })
-                           .Append(mlContext.Regression.Trainers.Sdca(labelColumnName: "Temperature", maximumNumberOfIterations: 100));
+            var mlContext = new MLContext();
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "weather.csv");
 
-            Console.WriteLine("Training is started.");
-            
-            model = pipeline.Fit(data);
+            // Load the dataset
+            IDataView dataView = mlContext.Data.LoadFromTextFile<WeatherData>(
+                dataPath, separatorChar: ',', hasHeader: true);
 
-            Console.WriteLine("Creating prediction for temperature");
-            predictor = mlContext.Model.CreatePredictionEngine<WeatherData, WeatherPredictionTemp>(model);
+            // Get the last known weather data
+            var lastWeather = mlContext.Data.CreateEnumerable<WeatherData>(dataView, reuseRowObject: false).Last();
+
+            // Predict each parameter separately
+            float predictedTemp = TrainAndPredict<WeatherData, WeatherPredictionTemp>(mlContext, dataView, "Temperature", lastWeather);
+            float predictedHumidity = TrainAndPredict<WeatherData, WeatherPredictionHumidity>(mlContext, dataView, "Humidity", lastWeather);
+            float predictedPressure = TrainAndPredict<WeatherData, WeatherPredictionPressure>(mlContext, dataView, "Pressure", lastWeather);
+            float predictedVisibility = TrainAndPredict<WeatherData, WeatherPredictionVisibility>(mlContext, dataView, "Visibility", lastWeather);
+
+            Console.WriteLine($"Generated Weather Data:");
+            Console.WriteLine($"Temperature: {predictedTemp:F2}");
+            Console.WriteLine($"Humidity: {predictedHumidity:F2}");
+            Console.WriteLine($"Pressure: {predictedPressure:F2}");
+            Console.WriteLine($"Visibility: {predictedVisibility:F2}");
         }
 
-        public WeatherData GenerateFromModel(float humidity, float pressure, float visibility)
+        /// <summary>
+        /// Generic method to train a model and predict a single weather parameter
+        /// </summary>
+        static float TrainAndPredict<TData, TPrediction>(MLContext mlContext, IDataView dataView, string labelColumn, WeatherData lastWeather)
+        where TData : class
+        where TPrediction : class, new()
         {
-            var prediction = predictor.Predict(new WeatherData
-            {
-                Humidity = humidity,
-                Pressure = pressure,
-                Visibility = visibility
-            });
+            // Create training pipeline
+            var pipeline = mlContext.Transforms.Concatenate("Features", new[] { "Temperature", "Humidity", "Pressure", "Visibility" })
+                .Append(mlContext.Regression.Trainers.FastTree(labelColumnName: labelColumn));
 
-            return new WeatherData
-            {
-                Temperature = prediction.PredictedTemperature,
-                Humidity = humidity,
-                Pressure = pressure,
-                Visibility = visibility
-            };
+            // Train the model
+            var model = pipeline.Fit(dataView);
+
+            // Create a prediction engine
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<WeatherData, TPrediction>(model);
+
+            // Predict the value
+            var prediction = predictionEngine.Predict(lastWeather);
+
+            // Get the predicted value using reflection
+            return (float)typeof(TPrediction).GetProperty($"Predicted{labelColumn}").GetValue(prediction);
         }
     }    
 }

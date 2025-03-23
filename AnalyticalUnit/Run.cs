@@ -38,6 +38,5 @@ if (Toogles.PARCE_SENSOR_CSV)
 if (Toogles.DATA_GENERATOR)
 {
     WeatherModel model = new WeatherModel();
-    var generatedData = model.GenerateFromModel(65, 1010, 10);
-    Console.WriteLine($"Generated Data: Temp={generatedData.Temperature}, Humidity={generatedData.Humidity}, Pressure={generatedData.Pressure}, Visibility={generatedData.Visibility}");
+    model.Generate();    
 }

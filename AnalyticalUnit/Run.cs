@@ -1,11 +1,12 @@
 ﻿using AnalyticalUnit;
 using AnalyticalUnit.Utils;
+using DataGeneratorLibrary;
 
 if (Toogles.BUILD_TABLE) TableBuilder.BuidTable();
 
 if (Toogles.PARCE_SENSOR_CSV)
 {
-    string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "CsvStorage", "sensors_data.csv");      
+    string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "CsvStorage", "sensors_data.csv");
     var sensorDataList = CsvSensorParser.ParseCsv(filePath);
 
     var temperatureData = sensorDataList
@@ -31,5 +32,12 @@ if (Toogles.PARCE_SENSOR_CSV)
         var mse = MeanSquaredError.CalculateMSE(temperatureData.Skip(temperatureData.Count - forecastedValues.Count).ToList(), forecastedValues);
 
         Console.WriteLine($"MSE: {mse}");
-    }    
+    }   
+}
+
+if (Toogles.DATA_GENERATOR)
+{
+    WeatherModel model = new WeatherModel();
+    var generatedData = model.GenerateFromModel(65, 1010, 10);
+    Console.WriteLine($"Generated Data: Temp={generatedData.Temperature}, Humidity={generatedData.Humidity}, Pressure={generatedData.Pressure}, Visibility={generatedData.Visibility}");
 }

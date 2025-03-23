@@ -1,9 +1,9 @@
 ﻿using Microsoft.ML.Data;
 namespace DataGeneratorLibrary
 {
-    public class WeatherPrediction
+    public class WeatherPredictionTemp
     {
         [ColumnName("Score")]
-        public float PredictedValue { get; set; }
+        public float PredictedTemperature { get; set; }
     }
 }

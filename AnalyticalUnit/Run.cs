@@ -5,8 +5,8 @@ using DataGeneratorLibrary;
 if (Toogles.BUILD_TABLE) TableBuilder.BuidTable();
 
 if (Toogles.PARCE_SENSOR_CSV)
-{
-    string filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "CsvStorage", "sensors_data.csv");
+{    
+    string filePath = Path.Combine(AppContext.BaseDirectory, "CsvStorage", "sensors_data.csv");
     var sensorDataList = CsvSensorParser.ParseCsv(filePath);
 
     var temperatureData = sensorDataList

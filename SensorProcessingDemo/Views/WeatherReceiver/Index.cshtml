@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Weather Data";
+}
+
+<link rel="stylesheet" href="~/css/windymap.css" asp-append-version="true" />
+<h2>Weather Data</h2>
+
+<label>Latitude:</label>
+<input class="long-lat-input" type="text" id="latitude" value="50.4" />
+<label>Longitude:</label>
+<input class="long-lat-input" type="text" id="longitude" value="30.5" />
+
+<button class="btn btn-primary" id="getWeatherBtn">Get Weather</button>
+
+<div id="weatherResult"></div>
+
+<script>
+    document.getElementById("getWeatherBtn").addEventListener("click", async function() {
+        let lat = document.getElementById("latitude").value;
+        let lon = document.getElementById("longitude").value;
+
+        let response = await fetch('/WeatherReceiver/GetWeather', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `lat=${lat}&lon=${lon}`
+        });
+
+        let data = await response.json();
+
+        // Check for errors
+        if (data.error) {
+            document.getElementById("weatherResult").innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+            return;
+        }
+
+        // Display data
+        document.getElementById("weatherResult").innerHTML = `
+            <h3>Weather in ${data.name}</h3>
+            <p>Temperature: ${data.main.temp}°C</p>
+            <p>Pressure: ${data.main.pressure} hPa</p>
+            <p>Humidity: ${data.main.humidity}%</p>
+            <p>Visibility: ${data.visibility} meters</p>
+        `;
+    });
+</script>

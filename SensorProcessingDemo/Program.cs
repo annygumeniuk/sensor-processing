@@ -25,6 +25,8 @@ builder.Services.AddScoped<ISensorDataService, SensorDataService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddHttpClient<WeatherService>();
+
 var jwtOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>();
 
 builder.Services.AddApiAuthAuthentification(configuration, jwtOptions);

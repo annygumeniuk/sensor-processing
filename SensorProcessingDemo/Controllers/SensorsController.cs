@@ -13,6 +13,7 @@ using CsvHelper;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Text;
+using SensorProcessingDemo.Services.Implementations;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -29,26 +30,29 @@ namespace SensorProcessingDemo.Controllers
         private readonly ICurrentUserService _currentUserService;
         private readonly IMonitoringService  _monitoringService;
         private readonly IAlertService       _alertService;
+        private readonly WeatherService      _weatherService;
 
         private static readonly Dictionary<string, (decimal min, decimal max)> SensorRanges =
             new Dictionary<string, (decimal min, decimal max)>
             {
-                { Enums.SENSORNAME.Temperature.ToString(),         (Constants.TEMP_MIN,      Constants.TEMP_MAX) },
-                { Enums.SENSORNAME.Humidity.ToString(),            (Constants.HUM_MIN,       Constants.HUM_MAX) },
-                { Enums.SENSORNAME.Visibility.ToString(),          (Constants.VIS_MIN,       Constants.VIS_MAX) },
-                { Enums.SENSORNAME.AtmosphericPressure.ToString(), (Constants.ATM_PRESS_MIN, Constants.ATM_PRESS_MAX) }
+                { SENSORNAME.Temperature.ToString(),         (Constants.TEMP_MIN,      Constants.TEMP_MAX) },
+                { SENSORNAME.Humidity.ToString(),            (Constants.HUM_MIN,       Constants.HUM_MAX) },
+                { SENSORNAME.Visibility.ToString(),          (Constants.VIS_MIN,       Constants.VIS_MAX) },
+                { SENSORNAME.AtmosphericPressure.ToString(), (Constants.ATM_PRESS_MIN, Constants.ATM_PRESS_MAX) }
             };
 
         public SensorsController(
             ISensorDataService sensorDataService,
             ICurrentUserService currentUserService,
             IMonitoringService monitoringService,
-            IAlertService alertService)
+            IAlertService alertService,
+            WeatherService weatherService)
         {
             _sensorDataService = sensorDataService;
             _currentUserService = currentUserService;
             _monitoringService = monitoringService;
             _alertService = alertService;
+            _weatherService = weatherService;
         }
 
         [HttpPost("toggle-monitoring")]
@@ -61,7 +65,7 @@ namespace SensorProcessingDemo.Controllers
             if (isRunning)
             {
                 SensorData.Clear(); // clear previous data
-                await _monitoringService.StartMonitoring(userId);
+                await _monitoringService.StartMonitoring(userId);                
                 _ = Task.Run(async () => await GenerateSensorDataLoop(userId));
             }
             else
@@ -95,39 +99,50 @@ namespace SensorProcessingDemo.Controllers
                 }
             }
         }
-
+        
         public async Task GenerateSensorDataLoop(int currentUserId)
         {
             while (isRunning)
-            {                
-                foreach (var sensor in SensorRanges.Keys)
+            {
+                // Fetch real weather data                
+                var weatherData = await _weatherService.GetWeatherAsync(Constants.LAT_KYIV, Constants.LONG_KYIV);
+
+                if (weatherData != null)
                 {
-                    var range = SensorRanges[sensor];
-                    var value = Math.Round((decimal)(Random.NextDouble() * (double)(range.max - range.min)) + range.min, 2);
-
-                    if (!SensorData.ContainsKey(sensor))
-                        SensorData[sensor] = new List<(DateTime, decimal)>();
-
-                    if (SensorData[sensor].Count > 100)
-                        SensorData[sensor].RemoveAt(0);
-                    
-                    SensorData[sensor].Add((DateTime.Now, value));
-                    Sensor sens = new Sensor(currentUserId, sensor, value);
-
-                    await _sensorDataService.Create(sens);
-
-                    if (value < range.min || value > range.max)
+                    // Map real values to sensor names
+                    var sensorValues = new Dictionary<string, decimal>
                     {
-                        var alert = new AlertCollector
-                        {
-                            SensorId = sens.Id,
-                            Sensor = sens
-                        };
+                        { "Temperature", (decimal)weatherData.Main.Temp },
+                        { "Humidity", weatherData.Main.Humidity },
+                        { "Visibility", weatherData.Visibility },
+                        { "AtmosphericPressure", weatherData.Main.Pressure }
+                    };
 
-                        await _alertService.Create(alert);
-                    }                                        
+                    foreach (var sensor in sensorValues.Keys)
+                    {
+                        decimal value = sensorValues[sensor];
+
+                        if (!SensorData.ContainsKey(sensor))
+                            SensorData[sensor] = new List<(DateTime, decimal)>();
+
+                        if (SensorData[sensor].Count > 100)
+                            SensorData[sensor].RemoveAt(0);
+
+                        SensorData[sensor].Add((DateTime.Now, value));
+
+                        // Store sensor data in the database
+                        Sensor sens = new Sensor(currentUserId, sensor, value);
+                        await _sensorDataService.Create(sens);
+
+                        // Check for alerts
+                        if (value < SensorRanges[sensor].min || value > SensorRanges[sensor].max)
+                        {
+                            var alert = new AlertCollector { SensorId = sens.Id, Sensor = sens };
+                            await _alertService.Create(alert);
+                        }
+                    }
                 }
-                await Task.Delay(Common.Constants.UpdateIntervalSeconds * 1000);
+                await Task.Delay(Constants.UpdateIntervalSeconds * 1000);
             }
         }
 

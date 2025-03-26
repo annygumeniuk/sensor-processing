@@ -75,10 +75,7 @@ namespace SensorProcessingDemo.Services.Implementations
             if (filter.DisplayTemp) selectedTypes.Add(Enums.SENSORNAME.Temperature.ToString());
             if (filter.DisplayHum) selectedTypes.Add(Enums.SENSORNAME.Humidity.ToString());
             if (filter.DisplayVis) selectedTypes.Add(Enums.SENSORNAME.Visibility.ToString());
-            if (filter.DisplayAtmPress) selectedTypes.Add(Enums.SENSORNAME.AtmosphericPressure.ToString());
-            {
-                
-            }
+            if (filter.DisplayAtmPress) selectedTypes.Add(Enums.SENSORNAME.AtmosphericPressure.ToString());            
 
             if (selectedTypes.Any())
             {

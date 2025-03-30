@@ -75,30 +75,6 @@ namespace SensorProcessingDemo.Controllers
 
             return Json(new { isRunning });
         }
-
-
-        public async Task Run()
-        {
-            int userId = Convert.ToInt32(_currentUserService.GetUserId());
-
-            var isExist = await _monitoringService.CurrentExistWithUserId(userId);
-
-            if (isRunning)
-            {
-                if (isExist == null)
-                {
-                    await _monitoringService.StartMonitoring(userId);
-                    _ = Task.Run(async () => await GenerateSensorDataLoop(userId));
-                }
-            }
-            else
-            {
-                if (isExist != null)
-                {
-                    await _monitoringService.StopMonitoring(userId);
-                }
-            }
-        }
         
         public async Task GenerateSensorDataLoop(int currentUserId)
         {
@@ -146,9 +122,9 @@ namespace SensorProcessingDemo.Controllers
             }
         }
 
-        public async Task<IActionResult> Index()
-        {
-            await Run();
+        [HttpGet]
+        public IActionResult Index()
+        { 
             return View();
         }
 

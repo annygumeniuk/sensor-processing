@@ -56,7 +56,7 @@ namespace SensorProcessingDemo.Controllers
         }
 
         [HttpPost("toggle-monitoring")]
-        public async Task<JsonResult> ToggleMonitoring()
+        public async Task<JsonResult> ToggleMonitoring([FromBody] Location location)
         {
             int userId = Convert.ToInt32(_currentUserService.GetUserId());
 
@@ -64,9 +64,12 @@ namespace SensorProcessingDemo.Controllers
 
             if (isRunning)
             {
+                double latitude = location.Latitude ?? Constants.LAT_KYIV;
+                double longitude = location.Longitude ?? Constants.LONG_KYIV;
+
                 SensorData.Clear(); // clear previous data
                 await _monitoringService.StartMonitoring(userId);                
-                _ = Task.Run(async () => await GenerateSensorDataLoop(userId));
+                _ = Task.Run(async () => await GenerateSensorDataLoop(userId, latitude, longitude));
             }
             else
             {
@@ -76,12 +79,12 @@ namespace SensorProcessingDemo.Controllers
             return Json(new { isRunning });
         }
         
-        public async Task GenerateSensorDataLoop(int currentUserId)
+        public async Task GenerateSensorDataLoop(int currentUserId, double latitude, double longitude)
         {
             while (isRunning)
             {
                 // Fetch real weather data                
-                var weatherData = await _weatherService.GetWeatherAsync(Constants.LAT_KYIV, Constants.LONG_KYIV);
+                var weatherData = await _weatherService.GetWeatherAsync(latitude, longitude);
 
                 if (weatherData != null)
                 {
@@ -121,8 +124,7 @@ namespace SensorProcessingDemo.Controllers
                 await Task.Delay(Constants.UpdateIntervalSeconds * 1000);
             }
         }
-
-        [HttpGet]
+        
         public IActionResult Index()
         { 
             return View();

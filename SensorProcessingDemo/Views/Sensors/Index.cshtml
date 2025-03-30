@@ -1,11 +1,23 @@
 ﻿@{
     ViewData["Title"] = "Sensor Dashboard";
 }
-
+<link rel="stylesheet" href="~/css/windymap.css" asp-append-version="true" />
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
 <h1>Real-Time Sensor Dashboard</h1>
 
-<button class="btn btn-primary" id="toggleMonitoringBtn" onclick="toggleMonitoring()">Start Monitoring</button>
+<form id="locationForm">
+    <label for="latitude">Latitude:</label>
+    <input class="long-lat-input" type="number" id="latitude" name="latitude" step="0.0001" min="@SensorProcessingDemo.Common.Constants.LAT_MIN" max="@SensorProcessingDemo.Common.Constants.LAT_MAX">    
+
+
+    <label for="longitude">Longitude:</label>
+    <input class ="long-lat-input" type="number" id="longitude" name="longitude" step="0.0001" min="@SensorProcessingDemo.Common.Constants.LONG_MIN" max="@SensorProcessingDemo.Common.Constants.LONG_MAX">
+    
+
+    <button type="button" class="btn btn-primary" id="toggleMonitoringBtn" onclick="toggleMonitoring()">Start Monitoring</button>
+</form>
+
 <div id="sensorData">
     <a asp-controller="Sensors" asp-action="GetAll">All records</a>
     <a asp-controller="AlertCollector" asp-action="Index">View Alerts</a>
@@ -21,10 +33,15 @@
 <script>
 
     async function toggleMonitoring() {
+       
+        const latitude = document.getElementById("latitude").value || null;
+        const longitude = document.getElementById("longitude").value || null;
+
         try {
             const response = await fetch('/toggle-monitoring', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude, longitude })
             });
 
             const data = await response.json();

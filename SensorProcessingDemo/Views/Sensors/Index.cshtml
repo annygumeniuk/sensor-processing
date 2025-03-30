@@ -1,7 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Sensor Dashboard";
 }
-<link rel="stylesheet" href="~/css/windymap.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/sensorpage.css" asp-append-version="true" />
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
@@ -9,28 +9,33 @@
 
 <h1>Real-Time Sensor Dashboard</h1>
 
-<form id="locationForm">
-    <label for="latitude">Latitude:</label>
-    <input class="long-lat-input" type="number" id="latitude" name="latitude" step="0.0001" 
-           min="@SensorProcessingDemo.Common.Constants.LAT_MIN" 
-           max="@SensorProcessingDemo.Common.Constants.LAT_MAX"
-           data-val="true"
-           data-val-required="Latitude is required"
-           data-val-range="@SensorProcessingDemo.Common.Constants.LAT_ErrorMessage">
-           <span class="text-danger" data-valmsg-for="latitude" data-valmsg-replace="true"></span>
+<div>
+    <form id="locationForm">
+        
+            <label for="latitude">Latitude:</label>
+            <input class="long-lat-input" type="number" id="latitude" name="latitude" step="0.0001" 
+                   min="@SensorProcessingDemo.Common.Constants.LAT_MIN" 
+                   max="@SensorProcessingDemo.Common.Constants.LAT_MAX"
+                   data-val="true"
+                   data-val-required="Latitude is required"
+                   data-val-range="@SensorProcessingDemo.Common.Constants.LAT_ErrorMessage">  
 
-
-    <label for="longitude">Longitude:</label>
-    <input class ="long-lat-input" type="number" id="longitude" name="longitude" step="0.0001"
-           min="@SensorProcessingDemo.Common.Constants.LONG_MIN"
-           max="@SensorProcessingDemo.Common.Constants.LONG_MAX"
-           data-val="true"
-           data-val-required="Longitude is required"
-           data-val-range="@SensorProcessingDemo.Common.Constants.LONG_ErrorMessage">
-    <span class="text-danger" data-valmsg-for="longitude" data-valmsg-replace="true"></span>    
-
-    <button type="button" class="btn btn-primary" id="toggleMonitoringBtn" onclick="toggleMonitoring()">Start Monitoring</button>
-</form>
+            <label for="longitude">Longitude:</label>
+            <input class ="long-lat-input" type="number" id="longitude" name="longitude" step="0.0001"
+                   min="@SensorProcessingDemo.Common.Constants.LONG_MIN"
+                   max="@SensorProcessingDemo.Common.Constants.LONG_MAX"
+                   data-val="true"
+                   data-val-required="Longitude is required"
+                   data-val-range="@SensorProcessingDemo.Common.Constants.LONG_ErrorMessage">        
+        
+        <button type="button" class="btn btn-primary" id="toggleMonitoringBtn" onclick="toggleMonitoring()">Start Monitoring</button>
+        
+        <div class="error-messages">
+                <span class="text-danger" data-valmsg-for="latitude" data-valmsg-replace="true"></span>
+                <span class="text-danger" data-valmsg-for="longitude" data-valmsg-replace="true"></span>
+        </div>
+    </form>
+</div>
 
 <div id="sensorData">
     <a asp-controller="Sensors" asp-action="GetAll">All records</a>

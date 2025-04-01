@@ -22,25 +22,35 @@ namespace SensorProcessingDemo.Services.Implementations
         {
             _logger = logger;           
             _sensorContext = sensorContext;
-        }   
+        }
 
-        public Task Create(Sensor sensor)
+        public async Task Create(Sensor sensor, Dictionary<string, (decimal min, decimal max)> SensorRanges)
         {
-            _logger.LogInformation("Trying to add new sensor data in db.");
+            _logger.LogInformation("Starting transaction to add sensor and potential alert.");
 
             try
             {
-                _sensorContext.AddAsync(sensor);
+                await _sensorContext.ExecuteInTransactionAsync(async context =>
+                {
+                    await context.Set<Sensor>().AddAsync(sensor);
+                    await context.SaveChangesAsync();
+
+                    if (sensor.Value < SensorRanges[sensor.Name].min || sensor.Value > SensorRanges[sensor.Name].max)
+                    {
+                        var alert = new AlertCollector(sensor.Id);
+                        await context.Set<AlertCollector>().AddAsync(alert);
+                        await context.SaveChangesAsync();
+                    }
+                });
+
+                _logger.LogInformation($"Sensor {sensor.Name} - {sensor.Value} added successfully.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error message: {ex}");
+                _logger.LogError($"Transaction failed: {ex}");
             }
-
-            _logger.LogInformation($"New sensor data {sensor.Name} - {sensor.Value} was added.");
-
-            return Task.CompletedTask;
         }
+
 
         public Task Delete(int sensorId)
         {
@@ -102,10 +112,10 @@ namespace SensorProcessingDemo.Services.Implementations
             return await _sensorContext.FindAsync(predicate);
         }
 
-        public Task<Sensor> GetSensorById(int sensorId)
+        public async Task<Sensor> GetSensorById(int sensorId)
         {
             _logger.LogInformation("Trying to get sensor data by id from db.");
-            var sensor = _sensorContext.GetByIdAsync(sensorId);
+            var sensor = await _sensorContext.GetByIdAsync(sensorId);
 
             return sensor;
         }

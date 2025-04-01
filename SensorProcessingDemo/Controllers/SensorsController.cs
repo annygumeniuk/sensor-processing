@@ -111,17 +111,10 @@ namespace SensorProcessingDemo.Controllers
 
                         // Store sensor data in the database
                         Sensor sens = new Sensor(currentUserId, sensor, value);
-                        await _sensorDataService.Create(sens);
-
-                        // Check for alerts
-                        if (value < SensorRanges[sensor].min || value > SensorRanges[sensor].max)
-                        {
-                            var alert = new AlertCollector { SensorId = sens.Id, Sensor = sens };
-                            await _alertService.Create(alert);
-                        }
+                        await _sensorDataService.Create(sens, SensorRanges);                        
                     }
-                }
-                await Task.Delay(Constants.UpdateIntervalSeconds * 1000);
+                    await Task.Delay(Constants.UpdateIntervalSeconds * 1000);
+                }                
             }
         }
         

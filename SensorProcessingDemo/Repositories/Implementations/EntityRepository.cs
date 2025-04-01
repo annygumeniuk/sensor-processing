@@ -74,5 +74,22 @@ namespace SensorProcessingDemo.Repositories.Implementations
             await using var context = await _contextFactory.CreateDbContextAsync();
             return await context.Set<T>().Select(selector).ToListAsync();
         }
+
+        public async Task ExecuteInTransactionAsync(Func<MonitoringSystemContext, Task> action)
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
+            try
+            {
+                await action(context);
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Transaction failed.", ex);
+            }
+        }
     }
 }

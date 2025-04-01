@@ -6,7 +6,8 @@ namespace SensorProcessingDemo.Repositories.Interfaces
     public interface IEntityRepository<T> where T : class
     {
         Task<IEnumerable<T>> GetAllAsync();
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> FindAsync(
+        Expression<Func<T, bool>> predicate,Func<IQueryable<T>, IQueryable<T>>? queryModifier = null);
         Task<T?> GetFirstOrDefault(Expression<Func<T, bool>> predicate);
         Task<T?> GetByIdAsync(object id);
         Task AddAsync(T entity);

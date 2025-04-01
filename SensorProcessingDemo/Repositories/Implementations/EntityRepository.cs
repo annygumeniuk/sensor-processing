@@ -39,11 +39,21 @@ namespace SensorProcessingDemo.Repositories.Implementations
             }
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> FindAsync(
+        Expression<Func<T, bool>> predicate,
+        Func<IQueryable<T>, IQueryable<T>>? queryModifier = null)
         {
             await using var context = _contextFactory.CreateDbContext();
-            return await context.Set<T>().Where(predicate).ToListAsync();
+            IQueryable<T> query = context.Set<T>().Where(predicate);
+
+            if (queryModifier != null)
+            {
+                query = queryModifier(query);
+            }
+
+            return await query.ToListAsync();
         }
+
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {

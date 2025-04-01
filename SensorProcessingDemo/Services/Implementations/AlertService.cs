@@ -2,6 +2,7 @@
 using SensorProcessingDemo.Models;
 using SensorProcessingDemo.Repositories.Interfaces;
 using SensorProcessingDemo.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace SensorProcessingDemo.Services.Implementations
 {
@@ -20,8 +21,8 @@ namespace SensorProcessingDemo.Services.Implementations
         {
             _logger.LogInformation("Trying to get sensors data for current user from db.");
             var predicate = PredicateBuilder.True<AlertCollector>().And(s => s.Sensor.UserId == userId);
-            
-            return await _alertContext.FindAsync(predicate);
+
+            return await _alertContext.FindAsync(predicate, query => query.Include(a => a.Sensor)); 
         }
 
         public Task Delete(int alertId)

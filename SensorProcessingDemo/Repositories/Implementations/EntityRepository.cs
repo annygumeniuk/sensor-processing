@@ -39,11 +39,21 @@ namespace SensorProcessingDemo.Repositories.Implementations
             }
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> FindAsync(
+        Expression<Func<T, bool>> predicate,
+        Func<IQueryable<T>, IQueryable<T>>? queryModifier = null)
         {
             await using var context = _contextFactory.CreateDbContext();
-            return await context.Set<T>().Where(predicate).ToListAsync();
+            IQueryable<T> query = context.Set<T>().Where(predicate);
+
+            if (queryModifier != null)
+            {
+                query = queryModifier(query);
+            }
+
+            return await query.ToListAsync();
         }
+
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
@@ -73,6 +83,23 @@ namespace SensorProcessingDemo.Repositories.Implementations
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
             return await context.Set<T>().Select(selector).ToListAsync();
+        }
+
+        public async Task ExecuteInTransactionAsync(Func<MonitoringSystemContext, Task> action)
+        {
+            await using var context = _contextFactory.CreateDbContext();
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
+            try
+            {
+                await action(context);
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Transaction failed.", ex);
+            }
         }
     }
 }

@@ -1,1 +1,56 @@
-﻿
+﻿@model AnalyticalUnit.Models.ForecastResult
+
+@{
+    ViewData["Title"] = "Weather Forecast Charts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<h2>Weather Forecast Charts</h2>
+
+@if (Model?.Forecasts != null && Model.Forecasts.Any())
+{
+    <div id="charts-container" style="display: flex; flex-direction: column; gap: 40px;">
+        @foreach (var location in Model.Forecasts.Keys)
+        {
+            var chartId = location.Replace(" ", "_") + "_Chart";
+
+            <h3>@location</h3>
+
+            <div id="@chartId" style="height: 300px; width: 100%;"></div>
+
+            @if (Model.MseValues?.ContainsKey(location) == true)
+            {
+                <p><strong>MSE:</strong> @Model.MseValues[location]</p>
+            }
+
+            <script>
+                window.addEventListener('DOMContentLoaded', function () {
+                    const chart = new CanvasJS.Chart("@chartId", {
+                        animationEnabled: true,
+                        title: { text: "Forecast for @location" },
+                        axisX: { title: "Time", valueFormatString: "HH:mm" },
+                        axisY: { title: "Value", includeZero: false },
+                                       data: [{
+                    type: "line",
+                    dataPoints: [
+                @for (int i = 0; i < Model.Forecasts[location].Count; i++)
+                {
+                    var point = Model.Forecasts[location][i];
+                    <text>{ label: "+@i h", y: @point.Value },</text>
+                }
+                    ]
+                }]
+                    });
+
+                    chart.render();
+                });
+            </script>
+        }
+    </div>
+}
+else
+{
+    <p>No forecast data available.</p>
+}

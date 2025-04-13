@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using SensorProcessingDemo.Services.Interfaces;
 using AnalyticalUnit.Utils;
+using AnalyticalUnit.Models;
+using System.Reflection.Metadata;
+using System.Data.Common;
+using Newtonsoft.Json;
 
 namespace SensorProcessingDemo.Controllers
 {
@@ -50,12 +54,19 @@ namespace SensorProcessingDemo.Controllers
             // Generate forecast for next 24 hours
             var forecastResult = forecaster.ForecastWeather(file, 24);
 
-            return Redirect("Forecasting");
+            TempData["ForecastResult"] = JsonConvert.SerializeObject(forecastResult);
+            return RedirectToAction("Forecasting", forecastResult);
         }
 
         [HttpGet]
         public async Task<IActionResult> Forecasting()
-        {            
+        {
+            if (TempData["ForecastResult"] is string forecastJson)
+            {
+                var forecastResult = JsonConvert.DeserializeObject<ForecastResult>(forecastJson);
+                return View(forecastResult);
+            }
+
             return View();
         }        
     }

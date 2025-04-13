@@ -51,22 +51,22 @@ if (Toogles.WEATHER_FORECASTING)
         var forecaster = new WeatherForecaster();
 
         // Generate forecast for next 24 hours
-        var forecastResult = forecaster.ForecastWeather(csvFilePath, 24);
+        // var forecastResult = forecaster.ForecastWeather(csvFilePath, 24);
 
         // Display results
-        Console.WriteLine("Weather Forecast for the Next 24 Hours:");
-        Console.WriteLine("======================================");
-
-        foreach (var parameter in forecastResult.Forecasts.Keys)
-        {
-            Console.WriteLine($"\n{parameter} Forecast (MSE: {forecastResult.MseValues[parameter]:F4}):");
-            Console.WriteLine("------------------------------------------");
-
-            foreach (var point in forecastResult.Forecasts[parameter])
-            {
-                Console.WriteLine($"{point.DateTime}: {point.Value:F2}");
-            }
-        }
+        // Console.WriteLine("Weather Forecast for the Next 24 Hours:");
+        // Console.WriteLine("======================================");
+        // 
+        // foreach (var parameter in forecastResult.Forecasts.Keys)
+        // {
+        //     Console.WriteLine($"\n{parameter} Forecast (MSE: {forecastResult.MseValues[parameter]:F4}):");
+        //     Console.WriteLine("------------------------------------------");
+        // 
+        //     foreach (var point in forecastResult.Forecasts[parameter])
+        //     {
+        //         Console.WriteLine($"{point.DateTime}: {point.Value:F2}");
+        //     }
+        // }
     }
     catch (Exception ex)
     {

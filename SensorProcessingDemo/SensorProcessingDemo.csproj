@@ -22,4 +22,8 @@
     <PackageReference Include="Microsoft.ML.FastTree" Version="4.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AnalyticalUnit\AnalyticalUnit.csproj" />
+  </ItemGroup>
+
 </Project>

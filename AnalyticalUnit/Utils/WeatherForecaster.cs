@@ -1,4 +1,5 @@
 ﻿using AnalyticalUnit.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace AnalyticalUnit.Utils
 {
@@ -31,7 +32,7 @@ namespace AnalyticalUnit.Utils
         /// <summary>
         /// Main forecasting method that processes CSV data and returns forecasts
         /// </summary>
-        public ForecastResult ForecastWeather(string csvFilePath, int forecastHours = 24)
+        public ForecastResult ForecastWeather(IFormFile csvFilePath, int forecastHours = 24)
         {
             // Parse CSV data
             var sensorData = CsvSensorParser.ParseCsv(csvFilePath);

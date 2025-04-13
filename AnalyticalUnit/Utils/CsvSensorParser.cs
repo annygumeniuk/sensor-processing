@@ -1,6 +1,7 @@
 ﻿using AnalyticalUnit.ParsingModels;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
@@ -19,6 +20,18 @@ namespace AnalyticalUnit.Utils
             using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true // Skips the first row (header)
+            });
+
+            return csv.GetRecords<SensorParsingModel>().ToList();
+        }
+
+        public static List<SensorParsingModel> ParseCsv(IFormFile file)
+        {
+            using var stream = file.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true
             });
 
             return csv.GetRecords<SensorParsingModel>().ToList();

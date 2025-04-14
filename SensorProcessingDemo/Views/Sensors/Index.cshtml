@@ -2,12 +2,38 @@
     ViewData["Title"] = "Sensor Dashboard";
 }
 <link rel="stylesheet" href="~/css/sensorpage.css" asp-append-version="true" />
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<!-- First jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Then jQuery validate (depends on jQuery) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+
+<!-- Finally jQuery validate unobtrusive (depends on both above) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
 
+<!-- CanvasJS should be loaded last, as it's used for charts -->
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
 <h1>Real-Time Sensor Dashboard</h1>
+
+<script>
+    // Debug script loading
+    console.log("Page loading started");
+
+    function checkLibraries() {
+        console.log("jQuery loaded:", typeof $ !== 'undefined');
+        console.log("jQuery validator loaded:", typeof $.validator !== 'undefined');
+        console.log("jQuery validator unobtrusive loaded:",
+            typeof $.validator !== 'undefined' && typeof $.validator.unobtrusive !== 'undefined');
+        console.log("CanvasJS loaded:", typeof CanvasJS !== 'undefined');
+    }
+
+    // Check after page loads
+    window.addEventListener('load', function() {
+        console.log("Window loaded");
+        checkLibraries();
+    });
+</script>
 
 <div>
     <form id="locationForm">
@@ -50,18 +76,50 @@
 </div>
 
 <script>
-     $(document).ready(function () {
-        $.validator.unobtrusive.parse("#locationForm");
-    });
+    // Store constants from server
+    const LAT_MIN = @SensorProcessingDemo.Common.Constants.LAT_MIN;
+    const LAT_MAX = @SensorProcessingDemo.Common.Constants.LAT_MAX;
+    const LONG_MIN = @SensorProcessingDemo.Common.Constants.LONG_MIN;
+    const LONG_MAX = @SensorProcessingDemo.Common.Constants.LONG_MAX;
+    const UPDATE_INTERVAL = @SensorProcessingDemo.Common.Constants.UpdateIntervalSeconds * 1000;
+    
+    function validateCoordinates(lat, lng) {
+           let isValid = true;
+
+           // Clear previous error messages
+           $('#latitudeError').text('');
+           $('#longitudeError').text('');
+
+           if (lat !== null) {
+               if (lat < LAT_MIN || lat > LAT_MAX) {
+                   $('#latitudeError').text(`Latitude must be between ${LAT_MIN} and ${LAT_MAX}`);
+                   isValid = false;
+               }
+           }
+
+           if (lng !== null) {
+               if (lng < LONG_MIN || lng > LONG_MAX) {
+                   $('#longitudeError').text(`Longitude must be between ${LONG_MIN} and ${LONG_MAX}`);
+                   isValid = false;
+               }
+           }
+
+           return isValid;
+       }
+
 
     async function toggleMonitoring() {
        
-        const latitude = document.getElementById("latitude").value || null;
-        const longitude = document.getElementById("longitude").value || null;
+        // Parse values as numbers
+        const latitudeInput = document.getElementById("latitude").value;
+        const longitudeInput = document.getElementById("longitude").value;
+        
+        const latitude = latitudeInput === "" ? null : parseFloat(latitudeInput);
+        const longitude = longitudeInput === "" ? null : parseFloat(longitudeInput);
 
         if (longitude != null && latitude != null) {
-            if (!$("#locationForm").valid()) {
-                return; // Prevent submission if validation fails
+              if (!validateCoordinates(latitude, longitude)) {
+                return; // Stop if validation fails
             }
         }
 
